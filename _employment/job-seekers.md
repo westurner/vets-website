@@ -3,7 +3,7 @@ title: Job Seekers
 template: 4-action-page
 ---
 
-Wherever you are in the transition process, the Veterans Employment Center provides career advice, résumé-building assistance, and access to employers who are committed to hiring Veterans and military spouses.
+Wherever you are in the transition process, the Veterans Employment Center provides career advice, résumé-building assistance, and access to employers who are committed to hiring Veterans and military spouses. 
 
 <div class="call-out" markdown="1">
 ### You may not be completely ready to start looking for a job, but there are other ways you can prepare.
@@ -86,6 +86,7 @@ Learn about the [career fairs](/employment/job-seekers/career-fairs) available f
 
 - Government and private resources offer [one-on-one assistance](/employment/job-seekers/one-on-one).
 - Qualified service-disabled Veterans can get [employment support services](/employment/job-seekers/service-disabled), such as small business counseling, as well as specialized help through [Vocational Rehabilitation and Employment (VR&amp;E)](http://www.benefits.va.gov/vocrehab/index.asp).
+- Veterans, transitiong Servicemembers, and spouses can get extensive help at the [American Job Center](http://www.careeronestop.org/ReEmployment/veterans/default.aspx)
 
 <br>
 
