@@ -23,13 +23,6 @@ then
   exit $?
 fi
 
-# If we're running the accessibility suite, but not pushing staging, exit
-
-if [[ $TEST_SUITE == 'accessibility' && $TRAVIS_BRANCH != 'staging' ]]
-then
-  exit 0;
-fi
-
 # Run lint and perform a build
 
 npm run lint
@@ -48,14 +41,16 @@ then
   npm run test:unit;
 fi
 
-if [[ $TEST_SUITE == 'e2e' ]]
+if [[ $TEST_SUITE == 'nightwatch' ]]
 then
   npm run selenium:bootstrap;
   npm run test:e2e;
 fi
 
-if [[ $TEST_SUITE == 'accessibility' ]]
+# Add accessibility tests if we're on staging
+
+if [[ $TEST_SUITE == 'nightwatch' && $TRAVIS_BRANCH == 'staging' ]]
 then
-  npm run selenium:bootstrap;
   npm run test:accessibility;
 fi
+
