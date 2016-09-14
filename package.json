@@ -17,7 +17,8 @@
     "test:unit": "mocha --recursive 'test/**/*.unit.spec.js?(x)' ",
     "test:unit:rx": "mocha --recursive 'test/rx/**/*.unit.spec.js?(x)' ",
     "test:watch": "mocha --watch --recursive 'test/**/*.unit.spec.js?(x)' ",
-    "watch": "node script/build.js --watch"
+    "watch": "node script/build.js --watch",
+    "serve": "node script/build.js --serve"
   },
   "repository": {
     "type": "git",
