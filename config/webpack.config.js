@@ -1,6 +1,7 @@
 // Staging config. Also the default config that prod and dev are based off of.
 
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const bourbon = require('bourbon').includePaths;
 const neat = require('bourbon-neat').includePaths;
 const path = require('path');
@@ -90,6 +91,15 @@ const configGenerator = (options) => {
       extensions: ['', '.js', '.jsx']
     },
     plugins: [
+      new HardSourceWebpackPlugin({
+        cacheDirectory: path.join(__dirname, '/cache/'),
+        recordsPath: path.join(__dirname, '/cache/records.json'),
+        environmentPaths: {
+          root: process.cwd(),
+          directories: ['node_modules'],
+          files: ['package.json', 'script/build.js', 'config/webpack.config.js'],
+        },
+      }),
       new webpack.DefinePlugin({
         __BUILDTYPE__: JSON.stringify(options.buildtype),
         'process.env': {
