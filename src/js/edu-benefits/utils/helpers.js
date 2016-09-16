@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import moment from 'moment';
 import { isValidDate } from './validations.js';
 
 export function getPageList(routes) {
@@ -48,6 +49,7 @@ export const chapterNames = {
   educationHistory: 'Education History',
   employmentHistory: 'Employment History',
   schoolSelection: 'School Selection',
+  personalInformation: 'Personal Information',
   review: 'Review'
 };
 
@@ -70,6 +72,14 @@ export function showSchoolAddress(educationType) {
     || educationType === 'correspondence';
 }
 
+export function dateToMoment(dateField) {
+  return moment({
+    year: dateField.year.value,
+    month: dateField.month.value - 1,
+    day: dateField.day.value
+  });
+}
+
 export function displayDateIfValid(dateObject) {
   if (typeof dateObject === 'object') {
     const { day, month, year } = dateObject;
@@ -78,4 +88,9 @@ export function displayDateIfValid(dateObject) {
     }
   }
   return null;
+}
+
+export function showSomeoneElseServiceQuestion(claimType) {
+  return claimType !== ''
+    && claimType !== 'vocationalRehab';
 }
