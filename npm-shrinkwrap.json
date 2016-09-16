@@ -6444,9 +6444,16 @@
       }
     },
     "sass-loader": {
-      "version": "4.0.0",
-      "from": "sass-loader@>=4.0.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/sass-loader/-/sass-loader-4.0.0.tgz"
+      "version": "4.0.2",
+      "from": "sass-loader@4.0.2",
+      "resolved": "https://registry.npmjs.org/sass-loader/-/sass-loader-4.0.2.tgz",
+      "dependencies": {
+        "async": {
+          "version": "2.0.1",
+          "from": "async@>=2.0.1 <3.0.0",
+          "resolved": "https://registry.npmjs.org/async/-/async-2.0.1.tgz"
+        }
+      }
     },
     "sax": {
       "version": "1.2.1",
