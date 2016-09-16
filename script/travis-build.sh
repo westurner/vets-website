@@ -22,10 +22,10 @@ npm run build -- --buildtype $BUILDTYPE;
 npm run test:unit;
 
 # Bootstrap selenium for all nightwatch-based tests
-npm run selenium:bootstrap;
+# npm run selenium:bootstrap;
 
 # Run end to end tests
-npm run test:e2e;
+# npm run test:e2e;
 
 # Run accessibility tests for master, staging, and production
 if [[ $TRAVIS_BRANCH == 'staging' ||
