@@ -92,8 +92,8 @@ const configGenerator = (options) => {
     },
     plugins: [
       new HardSourceWebpackPlugin({
-        cacheDirectory: path.join(__dirname, '/cache/'),
-        recordsPath: path.join(__dirname, '/cache/records.json'),
+        cacheDirectory: path.join(__dirname, '../cache/'),
+        recordsPath: path.join(__dirname, '../cache/records.json'),
         environmentPaths: {
           root: process.cwd(),
           directories: ['node_modules'],
