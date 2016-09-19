@@ -1,7 +1,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-const fields = require('../../src/common/fields');
+const fields = require('../../../src/js/common/model/fields');
 const dirtyAllFields = fields.dirtyAllFields;
 const makeField = fields.makeField;
 

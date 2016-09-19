@@ -6,12 +6,15 @@ import Email from '../../../../src/js/common/components/questions/Email';
 import { makeField } from '../../../../src/js/common/model/fields';
 
 describe('<Email>', () => {
-  it('does not include ErrorMessage component when valid Email', () => {
-    const tree = SkinDeep.shallowRender(<Email email={makeField('test@test.com')} onValueChange={(_update) => {}}/>);
-    const errorableInputs = tree.everySubTree('ErrorableTextInput');
-    expect(errorableInputs).to.have.lengthOf(1);
-    expect(errorableInputs[0].props.errorMessage).to.be.undefined;
+  ['user@example.com', 'user+va@example.com', 'user.name+va@example.com', 'user_name@example.gov', 'user@examp.le'].forEach(email => {
+    it('excludes ErrorMessage prop when valid email ['+email+']', () => {
+      const tree = SkinDeep.shallowRender(<Email email={makeField(email)} onUserInput={(_update) => {}}/>);
+      const errorableInputs = tree.everySubTree('ErrorableTextInput');
+      expect(errorableInputs).to.have.lengthOf(1);
+      expect(errorableInputs[0].props.errorMessage).to.be.undefined;
+    });
   });
+
 
   it('sets error message when Email is invalid', () => {
     const tree = SkinDeep.shallowRender(<Email email={makeField('test', true)} onValueChange={(_update) => {}}/>);

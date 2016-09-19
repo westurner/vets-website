@@ -168,7 +168,7 @@ function createTestVeteran() {
   };
 }
 
-describe.only('Edu benefits json schema', () => {
+describe('Edu benefits json schema', () => {
   function matches(source, target) {
     if (!_.isUndefined(source) && !_.isUndefined(target)) {
       if (_.isObject(source)) {
