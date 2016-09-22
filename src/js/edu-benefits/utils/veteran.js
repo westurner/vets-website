@@ -104,7 +104,7 @@ export function createVeteran() {
     },
     toursOfDuty: [],
     postHighSchoolTrainings: [],
-    faaFlightCertificatesInformation: [],
+    faaFlightCertificatesInformation: makeField(''),
     highSchoolOrGedCompletionDate: {
       month: makeField(''),
       day: makeField(''),
