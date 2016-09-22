@@ -19,6 +19,15 @@ import { isValidPage, isValidForm } from '../utils/validations';
 import { ensurePageInitialized, updateCompletedStatus, submitForm } from '../actions/index';
 
 const Element = Scroll.Element;
+const scroller = Scroll.scroller;
+
+const scrollToTop = () => {
+  scroller.scrollTo('topScrollElement', {
+    duration: 500,
+    delay: 0,
+    smooth: true,
+  });
+};
 
 class EduBenefitsApp extends React.Component {
   componentWillReceiveProps(nextProps) {
@@ -26,6 +35,7 @@ class EduBenefitsApp extends React.Component {
     const b = this.props.submission.status;
     if (a !== b && a === 'applicationSubmitted') {
       this.props.router.push('/submit-message');
+      scrollToTop();
     }
   }
   render() {

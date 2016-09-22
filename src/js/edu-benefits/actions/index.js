@@ -1,4 +1,4 @@
-// import { veteranToApplication } from '../utils/veteran';
+import { veteranToApplication } from '../utils/veteran';
 
 export const UPDATE_COMPLETED_STATUS = 'UPDATE_COMPLETED_STATUS';
 export const UPDATE_INCOMPLETE_STATUS = 'UPDATE_INCOMPLETE_STATUS';
@@ -86,28 +86,28 @@ export function updateSubmissionTimestamp(value) {
   };
 }
 
-export function submitForm() {
-  // const application = veteranToApplication(data);
+export function submitForm(data) {
+  const application = veteranToApplication(data);
   return dispatch => {
+    dispatch(updateCompletedStatus('/review-and-submit'));
     dispatch(updateSubmissionStatus('submitPending'));
-    dispatch(updateSubmissionStatus('applicationSubmitted'));
-    // fetch('/api/v0/education_benefits_claims', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'X-Key-Inflection': 'camel'
-    //   },
-    //   body: JSON.stringify({
-    //     educationBenefitsClaim: {
-    //       form: application
-    //     }
-    //   })
-    // }).then(res => {
-    //   if (res.ok) {
-    //     dispatch(updateSubmissionStatus('applicationSubmitted'));
-    //   } else {
-    //     dispatch(updateSubmissionStatus('error'));
-    //   }
-    // });
+    fetch('/api/v0/education_benefits_claims', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Key-Inflection': 'camel'
+      },
+      body: JSON.stringify({
+        educationBenefitsClaim: {
+          form: application
+        }
+      })
+    }).then(res => {
+      if (res.ok) {
+        dispatch(updateSubmissionStatus('applicationSubmitted'));
+      } else {
+        dispatch(updateSubmissionStatus('error'));
+      }
+    });
   };
 }
