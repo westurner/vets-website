@@ -95,11 +95,11 @@ const configGenerator = (options) => {
       new HardSourceWebpackPlugin({
         cacheDirectory: path.join(__dirname, '../cache/'),
         recordsPath: path.join(__dirname, '../cache/records.json'),
-        environmentPaths: {
-          root: process.cwd(),
-          directories: ['node_modules'],
-          files: ['package.json', 'script/build.js', 'config/webpack.config.js'],
+        configHash: () => {
+          // TODO: hash of files in config?
+          return process.env.NODE_ENV;
         },
+        environmentPaths: false
       }),
       new webpack.DefinePlugin({
         __BUILDTYPE__: JSON.stringify(options.buildtype),
