@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
+import Scroll from 'react-scroll';
 
 import { connect } from 'react-redux';
 
@@ -17,6 +18,7 @@ import RoutesDropdown from '../components/debug/RoutesDropdown';
 import { isValidPage, isValidForm } from '../utils/validations';
 import { ensurePageInitialized, updateCompletedStatus, submitForm } from '../actions/index';
 
+const Element = Scroll.Element;
 
 class EduBenefitsApp extends React.Component {
   componentWillReceiveProps(nextProps) {
@@ -51,6 +53,7 @@ class EduBenefitsApp extends React.Component {
       <div className="row">
         {devPanel}
         <div className="medium-4 columns show-for-medium-up">
+          <Element name="topScrollElement"/>
           <Nav
               data={data}
               pages={pageState}
