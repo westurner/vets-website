@@ -81,6 +81,11 @@ export default class BenefitsSelectionFields extends React.Component {
             name="chapter32"
             checked={this.props.data.chapter32}
             onValueChange={(update) => {this.props.onStateChange('chapter32', update);}}/>
+        <ErrorableCheckbox
+            label="I don’t know which education benefit I want"
+            name="unknownBenefit"
+            checked={this.props.data.unknownBenefit}
+            onValueChange={(update) => {this.props.onStateChange('unknownBenefit', update);}}/>
       </div>
       <div className="input-section">
         <ErrorableRadioButtons

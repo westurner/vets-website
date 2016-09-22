@@ -95,6 +95,7 @@ export function createVeteran() {
     chapter1606: false,
     chapter32: false,
     chapter33: false,
+    unknownBenefit: false,
     serviceAcademyGraduationYear: makeField(''),
     currentlyActiveDuty: {
       yes: makeField(''),
