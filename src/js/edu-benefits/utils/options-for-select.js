@@ -466,10 +466,10 @@ const accountTypes = [
 ];
 
 const relinquishableBenefits = [
-  { label: 'I don\'t have anything to relinquish', value: 'unknown' },
-  { label: 'Chapter 30', value: 'chapter30' },
-  { label: 'Chapter 1606', value: 'chapter1606' },
-  { label: 'Chapter 1607', value: 'chapter1607' }
+  { label: 'I don\'t have anything to give up', value: 'unknown' },
+  { label: 'Montgomery GI Bill (MGIB or Chapter 30) Education Assistance Program', value: 'chapter30' },
+  { label: 'Montgomery GI Bill Selected Reserve (MGIB-SR or Chapter 1606)  Educational Assistance Program', value: 'chapter1606' },
+  { label: 'Reserve Educational Assistance Program (REAP or Chapter 1607)', value: 'chapter1607' }
 ];
 
 const hoursTypes = [
