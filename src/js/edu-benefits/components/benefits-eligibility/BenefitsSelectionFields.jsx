@@ -14,13 +14,17 @@ export default class BenefitsSelectionFields extends React.Component {
     if (this.props.data.chapter33) {
       relinquishSection = (<RadioButtonsSubSection showIfValueChosen="chapter33">
         <p className="form-indent">
-          <p>I acknowledge that by choosing to activate my Post-9/11 GI Bill (chapter 33) benefits, I may not receive more than a total of 48 months of benefits under two or more programs.</p>
-          <p>I understand that if I enroll in the Post-9/11 GI Bill (and give up my MGIB benefit), VA will limit the number of Post-9/11 GI Bill benefit months to the number of entitlement months remaining under MGIB on the effective date of my election.</p>
-          <p>Once I make this choice, I <strong>cannot</strong> change it.</p>
+          <p>You’ll need to make two important decisions on this page. If you have questions about this, talk to a specialist at 1-888-GIBILL (1-888-442-4551).</p>
+          (Part I)
+          <ul className="edu-benefits-list">
+            <li>I acknowledge that by choosing to activate my Post-9/11 GI Bill (chapter 33) benefits, I may not receive more than a total of 48 months of benefits under two or more programs.</li>
+            <li>I understand that if I enroll in the Post-9/11 GI Bill (and give up my MGIB benefit), VA will limit the number of Post-9/11 GI Bill benefit months to the number of entitlement months remaining under MGIB on the effective date of my election.</li>
+            <li>Once I make this choice, I <strong>cannot</strong> change it.</li>
+          </ul>
         </p>
         <fieldset className="usa-alert usa-alert-info edu-benefits-info-no-icon">
           <div>
-            I acknowledge that by choosing to activate my Post-9/11 GI Bill benefits, I have to give up one of the other educational programs for which I’m also eligible. Once I do this, I can’t change it.
+            (Part II) I acknowledge that by choosing to activate my Post-9/11 GI Bill benefits, I have to give up one of the other educational programs for which I’m also eligible. Once I do this, I can’t change it.
             <ErrorableRadioButtons required={this.props.data.chapter33}
                 errorMessage={validateIfDirty(this.props.data.benefitsRelinquished, isNotBlank) ? '' : 'Please select a response'}
                 label="I choose to give up:"
