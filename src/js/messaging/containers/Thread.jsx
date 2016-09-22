@@ -10,6 +10,8 @@ import {
   updateReplyCharacterCount
 } from '../actions/messages';
 
+import { toggleCreateFolderModal } from '../actions/modals';
+
 import Message from '../components/Message';
 import MessageSend from '../components/compose/MessageSend';
 import MessageWrite from '../components/compose/MessageWrite';
@@ -107,15 +109,15 @@ class Thread extends React.Component {
             currentMessageNumber={currentIndex + 1}
             folders={this.props.folders}
             folderMessageCount={folderMessageCount}
-            handlePrev={fetchPrevMessage}
-            handleNext={fetchNextMessage}
+            onClickPrev={fetchPrevMessage}
+            onClickNext={fetchNextMessage}
             subject={thread[0].subject}
             threadMessageCount={thread.length}
             threadId={this.props.params.id}
             messagesCollapsed={(this.props.messagesCollapsed.size > 0)}
             moveToIsOpen={this.props.moveToOpened}
             onChooseFolder={this.handleMoveTo}
-            onCreateFolder={(e) => {e.preventDefault();}}
+            onCreateFolder={this.props.toggleCreateFolderModal}
             onToggleThread={this.props.toggleMessagesCollapsed}
             onToggleMoveTo={this.props.toggleMoveTo}/>
       );
@@ -182,6 +184,7 @@ const mapStateToProps = (state) => {
     folders: state.folders.data.items,
     folderMessages: state.folders.data.currentItem.messages,
     messagesCollapsed: state.messages.ui.messagesCollapsed,
+    modals: state.modals,
     moveToOpened: state.messages.ui.moveToOpened,
     thread: state.messages.data.thread,
     visibleDetailsId: state.messages.ui.visibleDetailsId
@@ -191,6 +194,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
   fetchThread,
   setVisibleDetails,
+  toggleCreateFolderModal,
   toggleMessageCollapsed,
   toggleMessagesCollapsed,
   toggleMoveTo,

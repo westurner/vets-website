@@ -1,6 +1,7 @@
 import set from 'lodash/fp/set';
 
 import {
+  CREATE_NEW_FOLDER,
   FETCH_FOLDERS_SUCCESS,
   FETCH_FOLDERS_FAILURE,
   FETCH_FOLDER_SUCCESS,
@@ -12,17 +13,20 @@ import {
 const initialState = {
   data: {
     currentItem: {
-      id: null,
+      attributes: {},
       messages: [],
-      startCount: 0,
-      endCount: 0,
-      totalCount: 0
+      pagination: {
+        currentPage: 0,
+        perPage: 0,
+        totalEntries: 0,
+        totalPages: 0
+      }
     },
     items: []
   },
   ui: {
     nav: {
-      expanded: false,
+      foldersExpanded: false,
       visible: false
     }
   }
@@ -35,25 +39,14 @@ export default function folders(state = initialState, action) {
       return set('data.items', items, state);
     }
     case FETCH_FOLDER_SUCCESS: {
-      const meta = action.data.meta;
-
-      // Set the messages of the currently viewed folder.
-      const id = meta.folderId;
-      const messages = action.data.data.map(
-        message => message.attributes
-      );
-
-      // Set the pagination data for the folder.
-      const totalCount = meta.count;
-      const startCount = 1 + (meta.currentPage - 1) * meta.perPage;
-      const endCount = Math.min(totalCount, meta.currentPage * meta.perPage);
+      const attributes = action.folder.data.attributes;
+      const messages = action.messages.data.map(message => message.attributes);
+      const pagination = action.messages.meta.pagination;
 
       const newItem = {
-        id,
+        attributes,
         messages,
-        startCount,
-        endCount,
-        totalCount
+        pagination
       };
 
       return set('data.currentItem', newItem, state);
@@ -61,7 +54,9 @@ export default function folders(state = initialState, action) {
     case TOGGLE_FOLDER_NAV:
       return set('ui.nav.visible', !state.ui.nav.visible, state);
     case TOGGLE_MANAGED_FOLDERS:
-      return set('ui.nav.expanded', !state.ui.nav.expanded, state);
+      return set('ui.nav.foldersExpanded', !state.ui.nav.foldersExpanded, state);
+    // TODO: Make CREATE_NEW_FOLDER request a new folder creation.
+    case CREATE_NEW_FOLDER:
     case FETCH_FOLDERS_FAILURE:
     case FETCH_FOLDER_FAILURE:
     default:
