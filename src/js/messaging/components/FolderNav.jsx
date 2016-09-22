@@ -2,6 +2,9 @@ import React from 'react';
 import { Link } from 'react-router';
 import classNames from 'classnames';
 
+import ButtonCreateFolder from './buttons/ButtonCreateFolder';
+
+
 class FolderNav extends React.Component {
   constructor(props) {
     super(props);
@@ -12,8 +15,8 @@ class FolderNav extends React.Component {
   makeFolderLink(folder) {
     let count;
 
-    if (folder.name === 'Inbox' && folder.unread_count > 0) {
-      count = ` (${folder.unread_count})`;
+    if (folder.name === 'Inbox' && folder.unreadCount > 0) {
+      count = ` (${folder.unreadCount})`;
     } else if (folder.name === 'Drafts' && folder.count > 0) {
       count = ` (${folder.count})`;
     }
@@ -22,7 +25,7 @@ class FolderNav extends React.Component {
       <Link
           activeClassName="usa-current"
           className="messaging-folder-nav-link"
-          to={`/messaging/folder/${folder.folder_id}`}>
+          to={`/messaging/folder/${folder.folderId}`}>
         {folder.name}
         {count}
       </Link>
@@ -46,9 +49,9 @@ class FolderNav extends React.Component {
 
     let myFoldersList;
 
-    if (this.props.expanded) {
+    if (this.props.isExpanded) {
       const myFolderListItems = folderList.map((folder, i) => {
-        return <li key={folder.folder_id}>{myFolderLinks[i]}</li>;
+        return <li key={folder.folderId}>{myFolderLinks[i]}</li>;
       });
 
       myFoldersList = (
@@ -60,8 +63,8 @@ class FolderNav extends React.Component {
 
     const iconClass = classNames({
       fa: true,
-      'fa-caret-down': !this.props.expanded,
-      'fa-caret-up': this.props.expanded
+      'fa-caret-down': !this.props.isExpanded,
+      'fa-caret-up': this.props.isExpanded
     });
 
     return (
@@ -88,7 +91,7 @@ class FolderNav extends React.Component {
 
     folderList = folderList.map(folder => {
       return (
-        <li key={folder.folder_id}>
+        <li key={folder.folderId}>
           {this.makeFolderLink(folder)}
         </li>
       );
@@ -102,10 +105,7 @@ class FolderNav extends React.Component {
           <i className="fa fa-folder"></i>
           &nbsp;Manage folders
         </button>
-        <button>
-          <i className="fa fa-plus"></i>
-          &nbsp;Create new folder
-        </button>
+        <ButtonCreateFolder onClick={() => {}}/>
       </li>
     );
 
@@ -125,17 +125,13 @@ FolderNav.contextTypes = {
 FolderNav.propTypes = {
   folders: React.PropTypes.arrayOf(
     React.PropTypes.shape({
-      // TODO: Remove when we switch to camel case.
-      // Lack of camel case makes eslint complain.
-      /* eslint-disable */
-      folder_id: React.PropTypes.number.isRequired,
+      folderId: React.PropTypes.number.isRequired,
       name: React.PropTypes.string.isRequired,
       count: React.PropTypes.number.isRequired,
-      unread_count: React.PropTypes.number.isRequired
-      /* eslint-enable */
+      unreadCount: React.PropTypes.number.isRequired
     })
   ).isRequired,
-  expanded: React.PropTypes.bool,
+  isExpanded: React.PropTypes.bool,
   onToggleFolders: React.PropTypes.func
 };
 
