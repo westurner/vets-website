@@ -29,8 +29,10 @@ export default class ContactInformationFields extends React.Component {
         <legend>Contact information</legend>
         <div className="input-section">
           <div className="usa-alert usa-alert-info">
-            <p className="usa-alert-text">Providing as much contact information as possible will help the VA
-            get in touch more efficiently, should we need more information.</p>
+            <div className="usa-alert-body">
+              <p className="usa-alert-text">Providing as much contact information as possible will help the VA
+              get in touch more efficiently, should we need more information.</p>
+            </div>
           </div>
         </div>
         <h4>Address</h4>
