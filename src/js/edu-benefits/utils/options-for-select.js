@@ -501,9 +501,9 @@ const ownBenefitsOptions = [
 ];
 
 const tourBenefits = [
-  { label: 'Chapter 30', value: 'chapter30' },
-  { label: 'Chapter 1606', value: 'chapter1606' },
-  { label: 'Chapter 32 / Section 903', value: 'chapter32' }
+  { label: 'Montgomery GI Bill – Active Duty (Chapter 30)', value: 'chapter30' },
+  { label: 'Montgomery GI Bill – Selected Reserve (MGIB-SR or chapter 1606)', value: 'chapter1606' },
+  { label: 'Post-Vietnam Era Veterans’ Educational Assistance Program (VEAP or Chapter 32)', value: 'chapter32' }
 ];
 
 module.exports = {
