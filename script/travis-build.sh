@@ -10,6 +10,15 @@
 
 set -e
 
+# Set source timestamps equal to their git modified dates
+# This is necessary for hard-source-plugin to work.
+for FILE in $(git ls-files)
+do
+    TIME=$(git log --pretty=format:%cd -n 1 --date=iso $FILE)
+    TIME=$(date -j -f '%Y-%m-%d %H:%M:%S %z' "$TIME" +%Y%m%d%H%M.%S)
+    touch -m -t $TIME $FILE
+done
+
 # Run package security checks
 npm install -g nsp
 nsp check

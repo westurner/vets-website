@@ -97,7 +97,7 @@ const configGenerator = (options) => {
         recordsPath: path.join(__dirname, '../cache/records.json'),
         configHash: () => {
           // TODO: hash of files in config?
-          return process.env.NODE_ENV;
+          return process.env.NODE_ENV || 'development';
         },
         environmentPaths: false
       }),
