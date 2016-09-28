@@ -8,6 +8,7 @@ class MessageSubject extends React.Component {
     return (
       <div className={this.props.cssClass}>
         <ErrorableTextInput
+            charMax={this.props.charMax}
             additionalClass={`${this.props.cssClass}-input`}
             label="Subject"
             onValueChange={this.props.onValueChange}
@@ -26,7 +27,10 @@ MessageSubject.propTypes = {
   onValueChange: React.PropTypes.func,
   placeholder: React.PropTypes.string,
   required: React.PropTypes.bool,
-  subject: React.PropTypes.object
+  subject: React.PropTypes.shape({
+    value: React.PropTypes.string,
+    dirty: React.PropTypes.bool
+  }).isRequired
 };
 
 export default MessageSubject;
