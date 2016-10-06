@@ -1,6 +1,6 @@
 import { veteranToApplication } from '../utils/veteran';
 
-import environment from '../../common/helpers/environment';
+// import environment from '../../common/helpers/environment';
 
 export const UPDATE_COMPLETED_STATUS = 'UPDATE_COMPLETED_STATUS';
 export const UPDATE_INCOMPLETE_STATUS = 'UPDATE_INCOMPLETE_STATUS';
@@ -93,7 +93,7 @@ export function submitForm(data) {
   return dispatch => {
     dispatch(updateCompletedStatus('/review-and-submit'));
     dispatch(updateSubmissionStatus('submitPending'));
-    fetch(`${environment.API_URL}/v0/education_benefits_claims`, {
+    fetch('https://dev-api.vets.gov/v0/education_benefits_claims', {
       method: 'POST',
       mode: 'cors',
       headers: {
