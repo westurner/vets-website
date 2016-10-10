@@ -1,13 +1,11 @@
 // Variables
 
-@import 'style';
-
 .sign-in-link {
   a {
-    color: $white;
+    color: #fff;
     text-decoration: none;
     &:visited{
-      color: $white;
+      color: #fff;
     }
     &:hover{
       text-decoration: none;
