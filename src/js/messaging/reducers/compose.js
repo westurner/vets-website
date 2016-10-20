@@ -1,17 +1,16 @@
 import set from 'lodash/fp/set';
 
 import { makeField } from '../../common/model/fields';
-import { composeMessage } from '../config';
 
 import {
-  SET_MESSAGE_FIELD,
-  SAVE_MESSAGE,
+  ADD_COMPOSE_ATTACHMENTS,
+  DELETE_COMPOSE_ATTACHMENT,
   DELETE_COMPOSE_MESSAGE,
   FETCH_RECIPIENTS_SUCCESS,
   FETCH_SENDER_SUCCESS,
   FETCH_RECIPIENTS_FAILURE,
-  UPDATE_COMPOSE_CHARACTER_COUNT
-} from '../actions/compose';
+  SET_MESSAGE_FIELD
+} from '../utils/constants';
 
 const initialState = {
   message: {
@@ -24,7 +23,6 @@ const initialState = {
     recipient: makeField(''),
     subject: makeField(''),
     text: makeField(''),
-    charsRemaining: composeMessage.maxChars.message,
     attachments: []
   },
   // List of potential recipients
@@ -48,18 +46,24 @@ function getRecipients(recipients) {
 
 export default function compose(state = initialState, action) {
   switch (action.type) {
+    case ADD_COMPOSE_ATTACHMENTS:
+      return set('message.attachments', [
+        ...state.message.attachments,
+        ...action.files
+      ], state);
+    case DELETE_COMPOSE_ATTACHMENT:
+      // Remove the attachment at the requested index.
+      state.message.attachments.splice(action.index, 1);
+      return set('message.attachments', state.message.attachments, state);
     case DELETE_COMPOSE_MESSAGE:
       return initialState;
-    case SET_MESSAGE_FIELD:
-      return set(action.path, action.field, state);
     case FETCH_RECIPIENTS_SUCCESS:
       return set('recipients', getRecipients(action.recipients.data), state);
     case FETCH_SENDER_SUCCESS:
       return set('message.sender', action.sender, state);
-    case UPDATE_COMPOSE_CHARACTER_COUNT:
-      return set('message.charsRemaining', action.chars, state);
+    case SET_MESSAGE_FIELD:
+      return set(action.path, action.field, state);
     case FETCH_RECIPIENTS_FAILURE:
-    case SAVE_MESSAGE:
     default:
       return state;
   }

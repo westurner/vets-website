@@ -9,7 +9,6 @@ import {
   veteranToApplication,
   createTour,
   createEducationPeriod,
-  createPreviousClaim,
   createRotcScholarship,
   createEmploymentPeriod
 } from '../../../src/js/edu-benefits/utils/veteran';
@@ -20,11 +19,9 @@ import {
   schoolTypes,
   accountTypes,
   suffixes,
-  claimTypes,
   serviceBranches,
   hoursTypes,
-  ownBenefitsOptions,
-  tourBenefits
+  ownBenefitsOptions
 } from '../../../src/js/edu-benefits/utils/options-for-select';
 
 const ajv = new Ajv();
@@ -46,19 +43,17 @@ const dateGen = () => qc.objectLike({
   year: makeField(qc.int.between(1900, 2016)),
 });
 const nameGen = () => qc.objectLike({
-  first: makeField(qc.string.matching(/^.{1-30}$/)),
-  middle: makeField(qc.string.matching(/^.{1-30}$/)),
-  last: makeField(qc.string.matching(/^.{1-30}$/)),
+  first: makeField(qc.string.matching(/^.{4,30}$/)),
+  middle: makeField(qc.string.matching(/^.{4,30}$/)),
+  last: makeField(qc.string.matching(/^.{4,30}$/)),
   suffix: makeField(qc.choose(...suffixes)),
 });
 const addressGen = () => qc.objectLike({
-  street: makeField(qc.string.matching(/^.{1-50}$/)),
-  city: makeField(qc.string.matching(/^.{1-50}$/)),
+  street: makeField(qc.string.matching(/^.{4,50}$/)),
+  city: makeField(qc.string.matching(/^.{4,50}$/)),
   country: makeField('USA'),
   state: makeField(qc.choose(...states.USA.map(x => x.value))),
-  provinceCode: makeField(''),
-  zipcode: makeField(qc.string.matching(/^\d{5-10}$/)),
-  postalCode: makeField(''),
+  postalCode: makeField(qc.string.matching(/^(\d{5}|\d{9})$/)),
 });
 const tourOfDutyGen = () => qc.objectLike({
   dateRange: qc.objectLike({
@@ -68,11 +63,11 @@ const tourOfDutyGen = () => qc.objectLike({
   serviceBranch: makeField(qc.choose(...serviceBranches.map(x => x.value))),
   serviceStatus: makeField(qc.string),
   involuntarilyCalledToDuty: makeField(yesNoGen()),
-  doNotApplyPeriodToSelected: qc.bool,
-  benefitsToApplyTo: makeField(qc.choose(...tourBenefits.map(x => x.value)))
+  applyPeriodToSelected: qc.bool,
+  benefitsToApplyTo: makeField(qc.string)
 });
 const scholarshipGen = () => qc.objectLike({
-  amount: makeField(qc.string.matching(/^[$]{0,1}\d{1-5}\.\d{1,2}$/)),
+  amount: makeField(qc.string.matching(/^[$]{0,1}\d{1,5}\.\d{1,2}$/)),
   year: makeField(qc.int.between(1900, 2016))
 });
 const educationGen = () => qc.objectLike({
@@ -94,16 +89,6 @@ const employmentGen = () => qc.objectLike({
   licenseOrRating: makeField(qc.string),
   postMilitaryJob: makeField(qc.string)
 });
-const previousClaimGen = () => qc.objectLike({
-  claimType: makeField(qc.choose(...claimTypes.map(x => x.value))),
-  previouslyAppliedWithSomeoneElsesService: makeField(yesNoGen()),
-  fileNumber: makeField(qc.string),
-  sponsorVeteran: qc.objectLike({
-    fullName: nameGen(),
-    fileNumber: makeField(qc.string),
-    payeeNumber: makeField(qc.string)
-  })
-});
 const matches = (source, target) => {
   if (!_.isUndefined(source) && !_.isUndefined(target)) {
     if (_.isObject(source)) {
@@ -120,9 +105,10 @@ function createTestVeteran() {
   return {
     benefitsRelinquished: makeField(qc.choose(...relinquishableBenefits.map(x => x.value))),
     chapter30: qc.bool,
-    chapter1606: qc.bool,
+    chapter1606: true,
     chapter32: qc.bool,
     chapter33: qc.bool,
+    checkedBenefit: makeField(''),
     serviceAcademyGraduationYear: makeField(qc.int.between(1900, 2016)),
     currentlyActiveDuty: qc.objectLike({
       yes: makeField(yesNoGen()),
@@ -183,8 +169,6 @@ function createTestVeteran() {
       accountNumber: makeField(qc.string),
       routingNumber: makeField(qc.choose(...routingNumbers))
     }),
-    previousVaClaims: qc.arrayOf(previousClaimGen()),
-    previouslyFiledClaimWithVa: makeField(yesNoGen()),
     applyingUsingOwnBenefits: makeField(qc.choose(...ownBenefitsOptions.map(x => x.value))),
     benefitsRelinquishedDate: dateGen()
   };
@@ -213,12 +197,6 @@ describe('Edu benefits json schema', () => {
     it('nonMilitaryJobs', () => {
       const testForm = employmentGen()(1);
       const blankForm = createEmploymentPeriod();
-
-      expect(matches(blankForm, testForm)).to.be.true;
-    });
-    it('previousVaClaims', () => {
-      const testForm = previousClaimGen()(1);
-      const blankForm = createPreviousClaim();
 
       expect(matches(blankForm, testForm)).to.be.true;
     });

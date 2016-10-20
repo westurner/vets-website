@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link, browserHistory } from 'react-router';
+import { Link } from 'react-router';
 
 import {
   allowedMimeTypes,
@@ -9,40 +9,42 @@ import {
   paths
 } from '../config';
 
-import MessageCategory from '../components/compose/MessageCategory';
+import {
+  dirtyAllFields
+} from '../../common/model/fields';
+
+import * as validations from '../utils/validations';
+
 import MessageFrom from '../components/compose/MessageFrom';
-import MessageSubject from '../components/compose/MessageSubject';
 import MessageRecipient from '../components/compose/MessageRecipient';
-import MessageSend from '../components/compose/MessageSend';
-import MessageWrite from '../components/compose/MessageWrite';
+import MessageSubjectGroup from '../components/compose/MessageSubjectGroup';
+import MessageWriteGroup from '../components/compose/MessageWriteGroup';
 import ModalConfirmDelete from '../components/compose/ModalConfirmDelete';
-import ModalAttachmentsTooBig from '../components/compose/ModalAttachmentsTooBig';
+import NoticeBox from '../components/NoticeBox';
 
 import {
+  addComposeAttachments,
+  deleteComposeAttachment,
   deleteComposeMessage,
-  saveMessage,
-  setMessageField,
   fetchRecipients,
   fetchSenderName,
-  updateComposeCharacterCount
-} from '../actions/compose';
-
-import { sendMessage } from '../actions/messages';
-
-import {
+  openAttachmentsModal,
+  saveDraft,
+  sendMessage,
+  setMessageField,
   toggleConfirmDelete,
-  toggleAttachmentsModal
-} from '../actions/modals';
+  updateComposeCharacterCount
+} from '../actions';
 
-class Compose extends React.Component {
+export class Compose extends React.Component {
   constructor() {
     super();
-    this.handleCategoryChange = this.handleCategoryChange.bind(this);
-    this.handleMessageChange = this.handleMessageChange.bind(this);
-    this.handleRecipientChange = this.handleRecipientChange.bind(this);
+    this.apiFormattedMessage = this.apiFormattedMessage.bind(this);
     this.handleConfirmDelete = this.handleConfirmDelete.bind(this);
-    this.handleSubjectChange = this.handleSubjectChange.bind(this);
-    this.sendNewMessage = this.sendNewMessage.bind(this);
+    this.handleMessageChange = this.handleMessageChange.bind(this);
+    this.isValidForm = this.isValidForm.bind(this);
+    this.sendMessage = this.sendMessage.bind(this);
+    this.saveDraft = this.saveDraft.bind(this);
   }
 
   componentDidMount() {
@@ -50,42 +52,66 @@ class Compose extends React.Component {
     this.props.fetchRecipients();
   }
 
-  sendNewMessage() {
-    this.props.sendMessage(this.props.message);
+  apiFormattedMessage() {
+    const message = this.props.message;
+
+    return {
+      attachments: message.attachments,
+      category: message.category.value,
+      subject: message.subject.value,
+      body: message.text.value,
+      recipientId: +message.recipient.value
+    };
   }
 
-  handleCategoryChange(valueObj) {
-    this.props.setMessageField('message.category', valueObj);
+  dirtyComposeForm() {
+    // Dirty all fields in the form object.
+    const message = dirtyAllFields(this.props.message);
+
+    // Resets the fields on submit to trigger error messages if applicable.
+    this.props.setMessageField('message.recipient', message.recipient);
+    this.props.setMessageField('message.category', message.category);
+    this.props.setMessageField('message.subject', message.subject);
+    this.props.setMessageField('message.text', message.text);
+
+    // return dirtied fields
+    return message;
   }
 
-  handleSubjectChange(valueObj) {
-    this.props.setMessageField('message.subject', valueObj);
+  isValidForm() {
+    const message = this.dirtyComposeForm();
+    const valid = validations.isValidRecipient(message.recipient) &&
+                  validations.isValidCategory(message.category) &&
+                  validations.isValidSubject(message.subject) &&
+                  validations.isValidMessageBody(message.text);
+    return valid;
   }
 
-  handleMessageChange(valueObj) {
-    this.props.setMessageField('message.text', valueObj);
-    this.props.updateComposeCharacterCount(valueObj, composeMessage.maxChars.message);
+  sendMessage() {
+    if (this.isValidForm()) {
+      this.props.sendMessage(this.apiFormattedMessage());
+    }
   }
 
-  handleRecipientChange(valueObj) {
-    this.props.setMessageField('message.recipient', valueObj);
+  saveDraft() {
+    this.props.saveDraft(this.apiFormattedMessage());
   }
 
   handleConfirmDelete(domEvent) {
-    // TODO: Dispatch an action that makes this API call
     domEvent.preventDefault();
-    // Send back to Inbox
-    const returnUrl = `${paths.FOLDERS_URL}/0`;
-
-    browserHistory.push(returnUrl);
     this.props.toggleConfirmDelete();
     this.props.deleteComposeMessage();
   }
 
+  handleMessageChange(valueObj) {
+    this.props.setMessageField('message.text', valueObj);
+  }
+
   render() {
     const message = this.props.message;
-    const subjectRequired = message.category &&
-                            message.category.value === 'OTHER';
+
+    // Tests the subject group for errors
+    const subjectError = validations.isValidSubjectLine(message.category, message.subject);
 
     return (
       <div>
@@ -103,61 +129,52 @@ class Compose extends React.Component {
           </button>
         </div>
         <form
-            id="messaging-compose"
+            id="msg-compose"
             onSubmit={(domEvent) => { domEvent.preventDefault(); }}>
           <MessageFrom
-              cssClass="messaging-from"
+              cssClass="msg-from"
               lastName={message.sender.lastName}
               firstName={message.sender.firstName}
               middleName={message.sender.middleName}/>
           <MessageRecipient
-              errorMessage={composeMessage.errors.recipient}
-              cssClass="messaging-recipient"
-              onValueChange={this.handleRecipientChange}
+              errorMessage={validations.isValidRecipient(message.recipient) ? '' : composeMessage.errors.recipient}
+              cssClass="msg-recipient msg-field"
+              onValueChange={this.props.setMessageField}
               options={this.props.recipients}
               recipient={message.recipient}/>
-          <fieldset className="messaging-subject-group">
-            <legend>Subject line:</legend>
-            <div>
-              <MessageCategory
-                  categories={messageCategories}
-                  cssClass="messaging-category"
-                  errorMessage={composeMessage.errors.category}
-                  onValueChange={this.handleCategoryChange}
-                  category={message.category}/>
-              <MessageSubject
-                  charMax={composeMessage.maxChars.subject}
-                  cssClass="messaging-subject"
-                  errorMessage={composeMessage.errors.subject}
-                  onValueChange={this.handleSubjectChange}
-                  placeholder={composeMessage.placeholders.subject}
-                  required={subjectRequired}
-                  subject={message.subject}/>
-            </div>
-          </fieldset>
-          <MessageWrite
-              cssClass="messaging-write"
-              onValueChange={this.handleMessageChange}
-              placeholder={composeMessage.placeholders.message}
-              text={message.text}/>
-          <MessageSend
+          <MessageSubjectGroup
+              categories={messageCategories}
+              category={message.category}
+              cssErrorClass={subjectError.type ? `msg-compose-error--${subjectError.type}` : undefined}
+              errorMessage={subjectError.hasError ? composeMessage.errors.subjectLine[subjectError.type] : undefined}
+              onCategoryChange={this.props.setMessageField}
+              onSubjectChange={this.props.setMessageField}
+              subject={message.subject}
+              subjectPlaceholder={composeMessage.placeholders.subject}/>
+          <MessageWriteGroup
               allowedMimeTypes={allowedMimeTypes}
-              charCount={message.charsRemaining}
-              cssClass="messaging-send-group"
-              onSave={this.props.saveMessage}
-              onSend={this.sendNewMessage}
-              onDelete={this.props.toggleConfirmDelete}/>
+              errorMessage={validations.isValidMessageBody(message.text) ? undefined : composeMessage.errors.message}
+              files={this.props.message.attachments}
+              maxFiles={composeMessage.attachments.maxNum}
+              maxFileSize={composeMessage.attachments.maxSingleFile}
+              maxTotalFileSize={composeMessage.attachments.maxTotalFiles}
+              onAttachmentsClose={this.props.deleteComposeAttachment}
+              onAttachmentUpload={this.props.addComposeAttachments}
+              onAttachmentsError={this.props.openAttachmentsModal}
+              onCharCountChange={this.props.updateComposeCharacterCount}
+              onDelete={this.props.toggleConfirmDelete}
+              onTextChange={this.props.setMessageField}
+              onSave={this.saveDraft}
+              onSend={this.sendMessage}
+              messageText={message.text}
+              placeholder={composeMessage.placeholders.message}/>
         </form>
+        <NoticeBox/>
         <ModalConfirmDelete
             cssClass="messaging-modal"
             onClose={this.props.toggleConfirmDelete}
             onDelete={this.handleConfirmDelete}
-            visible={this.props.modals.deleteConfirm.visible}/>
-        <ModalAttachmentsTooBig
-            cssClass="messaging-modal"
-            id="messaging-add-attachments"
-            onClose={this.props.toggleAttachmentsModal}
-            visible={this.props.modals.attachments.visible}/>
+            visible={this.props.deleteConfirmModal.visible}/>
       </div>
     );
   }
@@ -167,26 +184,21 @@ const mapStateToProps = (state) => {
   return {
     message: state.compose.message,
     recipients: state.compose.recipients,
-    modals: {
-      deleteConfirm: {
-        visible: state.modals.deleteConfirm.visible
-      },
-      attachments: {
-        visible: state.modals.attachments.visible
-      }
-    }
+    deleteConfirmModal: state.modals.deleteConfirm
   };
 };
 
 const mapDispatchToProps = {
+  addComposeAttachments,
+  deleteComposeAttachment,
   deleteComposeMessage,
-  saveMessage,
-  sendMessage,
-  setMessageField,
   fetchRecipients,
   fetchSenderName,
+  openAttachmentsModal,
+  saveDraft,
+  sendMessage,
+  setMessageField,
   toggleConfirmDelete,
-  toggleAttachmentsModal,
   updateComposeCharacterCount
 };
 

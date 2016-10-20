@@ -1,6 +1,17 @@
 import _ from 'lodash/fp';
 import { makeField } from '../../common/model/fields';
 import { dateToMoment } from './helpers';
+import moment from 'moment';
+
+export function makeAddressField() {
+  return {
+    street: makeField(''),
+    city: makeField(''),
+    country: makeField('USA'),
+    state: makeField(''),
+    postalCode: makeField(''),
+  };
+}
 
 export function createTour() {
   return {
@@ -19,7 +30,7 @@ export function createTour() {
     serviceBranch: makeField(''),
     serviceStatus: makeField(''),
     involuntarilyCalledToDuty: makeField(''),
-    doNotApplyPeriodToSelected: false,
+    applyPeriodToSelected: true,
     benefitsToApplyTo: makeField('')
   };
 }
@@ -64,24 +75,6 @@ export function createRotcScholarship() {
   };
 }
 
-export function createPreviousClaim() {
-  return {
-    claimType: makeField(''),
-    previouslyAppliedWithSomeoneElsesService: makeField(''),
-    fileNumber: makeField(''),
-    sponsorVeteran: {
-      fullName: {
-        first: makeField(''),
-        middle: makeField(''),
-        last: makeField(''),
-        suffix: makeField('')
-      },
-      fileNumber: makeField(''),
-      payeeNumber: makeField('')
-    }
-  };
-}
-
 export function createFlightCertificate() {
   return {
     name: makeField('')
@@ -89,12 +82,14 @@ export function createFlightCertificate() {
 }
 
 export function createVeteran() {
+  const today = moment();
   return {
     benefitsRelinquished: makeField(''),
     chapter30: false,
     chapter1606: false,
     chapter32: false,
     chapter33: false,
+    checkedBenefit: makeField(''),
     serviceAcademyGraduationYear: makeField(''),
     currentlyActiveDuty: {
       yes: makeField(''),
@@ -119,7 +114,7 @@ export function createVeteran() {
     additionalContributions: false,
     activeDutyKicker: false,
     reserveKicker: false,
-    activeDutyRepaying: makeField(''),
+    activeDutyRepaying: false,
     activeDutyRepayingPeriod: {
       to: {
         month: makeField(''),
@@ -152,15 +147,7 @@ export function createVeteran() {
     gender: makeField(''),
     hasNonMilitaryJobs: makeField(''),
     nonMilitaryJobs: [],
-    veteranAddress: {
-      street: makeField(''),
-      city: makeField(''),
-      country: makeField(''),
-      state: makeField(''),
-      provinceCode: makeField(''),
-      zipcode: makeField(''),
-      postalCode: makeField(''),
-    },
+    veteranAddress: makeAddressField(),
     email: makeField(''),
     emailConfirmation: makeField(''),
     homePhone: makeField(''),
@@ -169,15 +156,7 @@ export function createVeteran() {
     educationType: makeField(''),
     school: {
       name: makeField(''),
-      address: {
-        street: makeField(''),
-        city: makeField(''),
-        country: makeField(''),
-        state: makeField(''),
-        provinceCode: makeField(''),
-        zipcode: makeField(''),
-        postalCode: makeField('')
-      }
+      address: makeAddressField()
     },
     educationObjective: makeField(''),
     educationStartDate: {
@@ -188,15 +167,7 @@ export function createVeteran() {
     secondaryContact: {
       fullName: makeField(''),
       sameAddress: false,
-      address: {
-        street: makeField(''),
-        city: makeField(''),
-        country: makeField(''),
-        state: makeField(''),
-        provinceCode: makeField(''),
-        zipcode: makeField(''),
-        postalCode: makeField('')
-      },
+      address: makeAddressField(),
       phone: makeField('')
     },
     bankAccount: {
@@ -204,13 +175,11 @@ export function createVeteran() {
       accountNumber: makeField(''),
       routingNumber: makeField('')
     },
-    previousVaClaims: [],
-    previouslyFiledClaimWithVa: makeField(''),
     applyingUsingOwnBenefits: makeField(''),
     benefitsRelinquishedDate: {
-      day: makeField(''),
-      month: makeField(''),
-      year: makeField('')
+      day: makeField(today.date().toString()),
+      month: makeField((today.month() + 1).toString()),
+      year: makeField(today.year().toString())
     }
   };
 }
@@ -218,7 +187,7 @@ export function createVeteran() {
 export function veteranToApplication(veteran) {
   let data = veteran;
 
-  if (data.activeDutyRepaying.value !== 'Y') {
+  if (!data.activeDutyRepaying) {
     data = _.unset('activeDutyRepayingPeriod', data);
   }
 
@@ -232,6 +201,7 @@ export function veteranToApplication(veteran) {
       case 'activeDutyRepaying':
       case 'hasNonMilitaryJobs':
       case 'emailConfirmation':
+      case 'checkedBenefit':
         return undefined;
 
       case 'serviceAcademyGraduationYear':
@@ -251,7 +221,6 @@ export function veteranToApplication(veteran) {
       case 'married':
       case 'haveDependents':
       case 'parentDependent':
-      case 'previouslyFiledClaimWithVa':
       case 'previouslyAppliedWithSomeoneElsesService':
         return value.value === 'Y';
 
@@ -285,7 +254,7 @@ export function veteranToApplication(veteran) {
         return false;
 
       case 'address':
-        if (value.city.value === '' && value.street.value === '' && value.country.value === '') {
+        if (value.city.value === '' && value.street.value === '') {
           return undefined;
         }
 
@@ -298,6 +267,12 @@ export function veteranToApplication(veteran) {
 
         return Number(value.value.replace('$', ''));
 
+      case 'dateRange':
+        if (value.from.month.value === '' && value.to.month.value === '') {
+          return undefined;
+        }
+
+        return value;
       default:
         // fall through.
     }

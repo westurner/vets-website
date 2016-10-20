@@ -40,10 +40,11 @@ const sourceDir = '../content/pages';
 
 const smith = Metalsmith(__dirname); // eslint-disable-line new-cap
 
+// TODO(crew): Change port back before merge to master.
 const optionDefinitions = [
   { name: 'buildtype', type: String, defaultValue: 'development' },
   { name: 'no-sanity-check-node-env', type: Boolean, defaultValue: false },
-  { name: 'port', type: Number, defaultValue: 3000 },
+  { name: 'port', type: Number, defaultValue: 3001 },
   { name: 'watch', type: Boolean, defaultValue: false },
   { name: 'serve', type: Boolean, defaultValue: false },
 
@@ -93,10 +94,14 @@ smith.destination(`../build/${options.buildtype}`);
 //    https://github.com/department-of-veterans-affairs/vets-website/issues/2721
 const ignoreList = ['memorial-benefits/*'];
 if (options.buildtype === 'production') {
+  ignoreList.push('disability-benefits/track-claims/*');
   ignoreList.push('education/apply-for-education-benefits/application.md');
   ignoreList.push('facilities/*');
   ignoreList.push('messaging/*');
   ignoreList.push('rx/*');
+  ignoreList.push('profile/*');
+  ignoreList.push('auth/*');
+  ignoreList.push('education/apply-for-education-benefits-new');
 }
 smith.use(ignore(ignoreList));
 
@@ -107,7 +112,9 @@ smith.use(filenames());
 
 smith.use(define({
   // Does anything even look at `site`?
+  /* eslint-disable */
   site: require('../config/site'),
+  /* eslint-disable */
   buildtype: options.buildtype
 }));
 
@@ -175,18 +182,23 @@ smith.use(sitemap('http://www.vets.gov'));
 // TODO(awong): Does anything even use the results of this plugin?
 
 if (options.watch) {
-  smith.use(watch());
+  smith.use(
+    watch({
+      paths: {
+        '../content/**/*': '**/*.{md,html}',
+      },
+      livereload: true,
+    })
+  );
 }
 
 if (options.watch || options.serve) {
-  // TODO(awong): Enable live reload of metalsmith pages per instructions at
-  // https://www.npmjs.com/package/metalsmith-watch
-
   // If in watch mode, assume hot reloading for JS and use webpack devserver.
   const devServerConfig = {
     contentBase: `build/${options.buildtype}`,
     historyApiFallback: {
       rewrites: [
+        { from: '^/disability-benefits/track-claims(.*)', to: '/disability-benefits/track-claims/' },
         { from: '^/education/apply-for-education-benefits/application(.*)', to: '/education/apply-for-education-benefits/application/' },
         { from: '^/facilities(.*)', to: '/facilities/' },
         { from: '^/healthcare/apply/application(.*)', to: '/healthcare/apply/application/' },
@@ -221,6 +233,7 @@ if (options.watch || options.serve) {
         auth: api.auth,
         secure: true,
         changeOrigin: true,
+        pathRewrite: { '^/api': '' },
         rewrite: function rewrite(req) {
           /* eslint-disable no-param-reassign */
           req.headers.host = api.host;
@@ -245,22 +258,14 @@ if (!options.watch) {
     allowRedirects: true,  // Don't require trailing slash for index.html links.
     warn: false,           // Throw an Error when encountering the first broken link not just a warning.
     allowRegex: new RegExp(
-        ['/disability-benefits/',
-          '/disability-benefits/apply-for-benefits/',
-          '/disability-benefits/learn/',
-          '/disability-benefits/learn/eligibility/.*',
-          '/employment/commitments',
+        ['/employment/commitments',
           '/employment/employers',
-          '/employment/employers/',
           '/employment/job-seekers/create-resume',
           '/employment/job-seekers/search-jobs',
           '/employment/job-seekers/skills-translator',
-          '/employment/users/sign_in',
           '/gi-bill-comparison-tool/',
-          '/gibill/',
-          '/healthcare/apply/application',
-          '/veterans-employment-center/',
-          'Employment-Resources/'].join('|'))
+          '/education/apply-for-education-benefits/application',
+          '/healthcare/apply/application'].join('|'))
   }));
 
   smith.use(webpack(webpackConfig));

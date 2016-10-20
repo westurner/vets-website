@@ -1,20 +1,40 @@
+const headers = {
+  'X-Key-Inflection': 'camel'
+};
+
 module.exports = {
-  // Basic pieces of data for making API requests.
+  // Basic config for making API requests.
   api: {
     url: '/api/v0/messaging/health',
     settings: {
       get: {
         method: 'GET',
-        headers: {
-          'X-Key-Inflection': 'camel'
-        }
+        headers
       },
-      post: {
+      postJson: {
         method: 'POST',
-        headers: {
-          'X-Key-Inflection': 'camel',
+        headers: Object.assign({}, headers, {
           'Content-Type': 'application/json'
-        }
+        })
+      },
+     // For sending binary data requests. Assumes use of FormData API.
+      postFormData: {
+        method: 'POST',
+        headers
+      },
+      put: {
+        method: 'PUT',
+        headers: Object.assign({}, headers, {
+          'Content-Type': 'application/json'
+        })
+      },
+      'delete': {
+        method: 'DELETE',
+        headers
+      },
+      patch: {
+        method: 'PATCH',
+        headers
       }
     }
   },
@@ -22,7 +42,8 @@ module.exports = {
   paths: {
     INBOX_URL: '/messaging',
     COMPOSE_URL: '/messaging/compose',
-    FOLDERS_URL: '/messaging/folder'
+    FOLDERS_URL: '/messaging/folder',
+    THREADS_URL: '/messaging/thread'
   },
 
   // The indices of systemFolders are positive. The
@@ -54,22 +75,41 @@ module.exports = {
       value: 'OTHER'
     }
   ],
+
   composeMessage: {
     placeholders: {
-      subject: 'Add an additional subject line (optional)',
+      subject: 'Add an additional subject line',
       message: 'Type your message here'
     },
     errors: {
-      category: 'Please select a category.',
+      attachments: {
+        tooLarge: {
+          title: 'Attachment size limit',
+          text: 'The file(s) you are trying to attach exceed the 3MB attachment size limit and the total size of attachments cannot exceed 6MB'
+        },
+        tooMany: {
+          title: 'Attachments limit',
+          text: 'You may not attach more than four files.'
+        }
+      },
+      subjectLine: {
+        category: 'Please select a category.',
+        subject: 'Please add subject description.'
+      },
       message: 'Please enter your message.',
-      subject: 'Please add subject description.',
       recipient: 'Please select a recipient from your health care team.'
     },
     maxChars: {
-      message: 2000,
       subject: 512
+    },
+    // Using bytes
+    attachments: {
+      maxNum: 4,
+      maxSingleFile: 3000000,
+      maxTotalFiles: 6000000
     }
   },
+
   allowedMimeTypes: [
     'text/plain',
     'application/pdf',
@@ -83,6 +123,7 @@ module.exports = {
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'image/png'
   ],
+
   createNewFolderSettings: {
     maxLength: 50,
     errorMessages: {
