@@ -136,7 +136,9 @@ smith.use(filenames());
 
 smith.use(define({
   // Does anything even look at `site`?
+  /* eslint-disable */
   site: require('../config/site'),
+  /* eslint-disable */
   buildtype: options.buildtype
 }));
 
