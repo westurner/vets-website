@@ -96,7 +96,7 @@ class DateInput extends React.Component {
           {requiredSpan}
         </label>
         {errorSpan}
-        <div className={isValid ? undefined : 'usa-input-error'}>
+        <div className={isValid ? undefined : 'usa-input-error form-error-date'}>
           <div className="usa-date-of-birth row">
             <div className="form-datefield-month">
               <ErrorableSelect errorMessage={isValid ? undefined : ''}
@@ -121,7 +121,6 @@ class DateInput extends React.Component {
                   max={new Date().getFullYear()}
                   min="1900"
                   pattern="[0-9]{4}"
-                  placeholder="yyyy"
                   field={this.props.year}
                   onValueChange={(update) => {this.handleChange('year', update);}}/>
             </div>

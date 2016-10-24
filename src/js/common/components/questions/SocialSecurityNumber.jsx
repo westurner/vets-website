@@ -30,14 +30,14 @@ class SocialSecurityNumber extends React.Component {
   }
 
   render() {
-    const errorMessage = this.validate(this.props.ssn) ? undefined : 'Please enter 9 digits with or without dashes (xxx-xx-xxxx)';
+    const errorMessage = this.validate(this.props.ssn) ? undefined : 'Please enter a valid SSN (nine digits, may include dashes)';
     return (
       <div>
         <ErrorableTextInput
+            additionalClass="usa-input-medium"
             errorMessage={errorMessage}
             label={this.props.label || 'Social Security Number'}
             name="ssn"
-            placeholder="xxx-xx-xxxx"
             required={this.props.required !== undefined ? this.props.required : true}
             field={this.props.ssn}
             onValueChange={this.props.onValueChange}/>

@@ -1,11 +1,43 @@
 import React from 'react';
 
+import {
+  validateFileSize,
+  validateNumAttachments,
+  validateTotalFileSize
+} from '../../utils/validations.js';
+
 import ButtonDelete from '../buttons/ButtonDelete';
-import CharacterCount from '../compose/CharacterCount';
 import MessageAddAttachment from './MessageAddAttachment';
 
-// TODO: Add attachments button / components
 class MessageSend extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleAttachmentsChange = this.handleAttachmentsChange.bind(this);
+  }
+
+  handleAttachmentsChange(domEvent) {
+    const input = domEvent.target;
+    let hasError = null;
+
+    if (window.File && window.FileList) {
+      if (input.files.length) {
+        const files = Array.from(input.files);
+
+        if (validateNumAttachments(files, this.props.maxFiles)) {
+          hasError = { type: 'tooMany' };
+        } else if (validateFileSize(files, this.props.maxFileSize) || validateTotalFileSize(files, this.props.maxTotalFileSize)) {
+          hasError = { type: 'tooLarge' };
+        }
+
+        if (hasError) {
+          this.props.onAttachmentsError(hasError);
+        } else {
+          this.props.onAttachmentUpload(files);
+        }
+      }
+    }
+  }
+
   render() {
     const isDisabled = this.props.charCount < 0;
 
@@ -17,34 +49,36 @@ class MessageSend extends React.Component {
             onClick={this.props.onSend}>Send</button>
         <button
             disabled={isDisabled}
-            className="usa-button-outline messaging-btn-save"
+            className="usa-button-outline msg-btn-save"
             type="button"
             value="save"
             onClick={this.props.onSave}>Save As Draft</button>
         <MessageAddAttachment
-            cssClass="messaging-attach"
+            cssClass="msg-attach"
             allowedMimeTypes={this.props.allowedMimeTypes}
-            id="messaging-attachments"
+            id="msg-attachments"
             label="Attach a file"
-            name="messageAttachments"/>
+            name="messageAttachments"
+            onChange={this.handleAttachmentsChange}/>
         <ButtonDelete
             compact
             onClickHandler={this.props.onDelete}/>
-        <CharacterCount
-            count={this.props.charCount}
-            cssClass="messaging-characters"/>
       </div>
     );
   }
 }
 
 MessageSend.propTypes = {
-  charCount: React.PropTypes.number,
+  allowedMimeTypes: React.PropTypes.arrayOf(React.PropTypes.string),
   cssClass: React.PropTypes.string,
+  maxFiles: React.PropTypes.number,
+  maxFileSize: React.PropTypes.number,
+  maxTotalFileSize: React.PropTypes.number,
+  onAttachmentUpload: React.PropTypes.func.isRequired,
+  onAttachmentsError: React.PropTypes.func.isRequired,
   onSave: React.PropTypes.func.isRequired,
   onSend: React.PropTypes.func.isRequired,
   onDelete: React.PropTypes.func.isRequired,
-  allowedMimeTypes: React.PropTypes.arrayOf(React.PropTypes.string)
 };
 
 export default MessageSend;

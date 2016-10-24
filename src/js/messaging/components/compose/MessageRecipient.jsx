@@ -1,14 +1,40 @@
 import React from 'react';
 import ErrorableSelect from '../../../common/components/form-elements/ErrorableSelect';
+import classNames from 'classnames';
 
 class MessageRecipient extends React.Component {
+  constructor() {
+    super();
+    this.handleRecipientChange = this.handleRecipientChange.bind(this);
+  }
+
+  handleRecipientChange(valueObj) {
+    this.props.onValueChange('message.recipient', valueObj);
+  }
+
   render() {
+    let error;
+
+    if (!!this.props.errorMessage) {
+      error = (
+        <p className="usa-input-error-message">
+          {this.props.errorMessage}
+        </p>);
+    }
+
+    const fieldCss = classNames(
+      this.props.cssClass,
+      { 'usa-input-error': !!this.props.errorMessage },
+      { 'msg-compose-error': !!this.props.errorMessage }
+    );
+
     return (
-      <div className={this.props.cssClass}>
+      <div className={fieldCss}>
+        {error}
         <ErrorableSelect
             label="To:"
             name="messageRecipient"
-            onValueChange={this.props.onValueChange}
+            onValueChange={this.handleRecipientChange}
             options={this.props.options}
             value={this.props.recipient}/>
       </div>

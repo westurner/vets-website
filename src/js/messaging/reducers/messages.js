@@ -3,80 +3,93 @@ import set from 'lodash/fp/set';
 import { makeField } from '../../common/model/fields';
 
 import {
-  DELETE_REPLY,
+  ADD_DRAFT_ATTACHMENTS,
+  CLEAR_DRAFT,
+  DELETE_DRAFT_ATTACHMENT,
   FETCH_THREAD_SUCCESS,
-  FETCH_THREAD_FAILURE,
-  SEND_MESSAGE_SUCCESS,
-  SEND_MESSAGE_FAILURE,
   TOGGLE_MESSAGE_COLLAPSED,
   TOGGLE_MESSAGES_COLLAPSED,
   TOGGLE_MOVE_TO,
-  UPDATE_REPLY_BODY,
-  UPDATE_REPLY_CHARACTER_COUNT
-} from '../actions/messages';
-
-import { composeMessage } from '../config';
+  TOGGLE_REPLY_DETAILS,
+  UPDATE_DRAFT
+} from '../utils/constants';
 
 const initialState = {
   data: {
     message: null,
     thread: [],
-    reply: {
-      body: makeField(''),
-      charsRemaining: composeMessage.maxChars.message
+    draft: {
+      attachments: [],
+      body: makeField('')
     }
   },
   ui: {
     messagesCollapsed: new Set(),
-    moveToOpened: false
+    moveToOpened: false,
+    replyDetailsCollapsed: true
   }
 };
 
-const resetReply = (state) => {
-  const newReply = {
-    body: makeField(''),
-    charsRemaining: composeMessage.maxChars.message
-  };
-
-  return set('data.reply', newReply, state);
+const resetDraft = (state) => {
+  return set('data.draft', initialState.data.draft, state);
 };
 
-export default function folders(state = initialState, action) {
+export default function messages(state = initialState, action) {
   switch (action.type) {
-    case DELETE_REPLY: {
-      return resetReply(state);
-    }
+    case ADD_DRAFT_ATTACHMENTS:
+      return set('data.draft.attachments', [
+        ...state.data.draft.attachments,
+        ...action.files
+      ], state);
+
+    case CLEAR_DRAFT:
+      return resetDraft(state);
+
+    case DELETE_DRAFT_ATTACHMENT:
+      state.message.attachments.splice(action.index, 1);
+      return set('data.draft.attachments', state.data.draft.attachments, state);
 
     case FETCH_THREAD_SUCCESS: {
-      const currentMessage = action.message.attributes;
-      const thread = action.thread.map(message => message.attributes).reverse();
+      // Consolidate message attributes and attachments
+      const currentMessage = Object.assign({}, action.message.data.attributes, { attachments: action.message.included });
+      const thread = action.thread.map(message => message.attributes);
+
+      // Collapse all the previous messages in the thread.
       const messagesCollapsed = new Set(thread.map((message) => {
         return message.messageId;
       }));
 
-      const newUi = {
-        messagesCollapsed,
-        movedToOpened: false
-      };
+      // Thread is received in most recent order.
+      // Reverse to display most recent message at the bottom.
+      thread.reverse();
 
-      let newState = set('ui', newUi, state);
-      newState = resetReply(newState);
-      newState = set('data.thread', thread, newState);
-
+      // The message is the draft if it hasn't been sent yet.
+      // Otherwise, the draft is an new, unsaved reply to the message.
+      let draft;
       if (!currentMessage.sentDate) {
-        const body = makeField(currentMessage.body);
-        const charsRemaining =
-          composeMessage.maxChars.message - currentMessage.body.length;
-
-        const reply = { body, charsRemaining };
-        newState = set('data.reply', reply, newState);
+        draft = Object.assign({}, currentMessage, {
+          // TODO: Get attachments from the draft.
+          attachments: [],
+          body: makeField(currentMessage.body),
+          replyMessageId: thread.length === 0 ?
+                          undefined :
+                          thread[thread.length - 1].messageId
+        });
+      } else {
+        draft = Object.assign({}, initialState.data.draft, {
+          attachments: [],
+          category: currentMessage.category,
+          recipientId: currentMessage.senderId,
+          replyMessageId: currentMessage.messageId,
+          subject: currentMessage.subject
+        });
       }
 
+      let newState = set('ui', { ...initialState.ui, messagesCollapsed }, state);
+      newState = set('data.thread', thread, newState);
+      newState = set('data.draft', draft, newState);
       return set('data.message', currentMessage, newState);
     }
-
-    case SEND_MESSAGE_SUCCESS:
-      return state;
 
     case TOGGLE_MESSAGE_COLLAPSED: {
       const newMessagesCollapsed = new Set(state.ui.messagesCollapsed);
@@ -109,14 +122,14 @@ export default function folders(state = initialState, action) {
     case TOGGLE_MOVE_TO:
       return set('ui.moveToOpened', !state.ui.moveToOpened, state);
 
-    case UPDATE_REPLY_BODY:
-      return set('data.reply.body', action.field, state);
+    case TOGGLE_REPLY_DETAILS:
+      return set('ui.replyDetailsCollapsed', !state.ui.replyDetailsCollapsed, state);
 
-    case UPDATE_REPLY_CHARACTER_COUNT:
-      return set('data.reply.charsRemaining', action.chars, state);
+    case UPDATE_DRAFT:
+      return set('data.draft', {
+        body: action.field
+      }, state);
 
-    case FETCH_THREAD_FAILURE:
-    case SEND_MESSAGE_FAILURE:
     default:
       return state;
   }
