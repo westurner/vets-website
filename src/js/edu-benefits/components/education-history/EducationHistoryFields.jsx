@@ -23,7 +23,7 @@ export default class EducationHistoryFields extends React.Component {
     ];
 
     const completionDate = this.props.data.highSchoolOrGedCompletionDate;
-    const { day, month, year } = completionDate;
+    const { month, year } = completionDate;
 
     return (<fieldset>
       <legend className="hide-for-small-only">Education history</legend>
@@ -32,7 +32,6 @@ export default class EducationHistoryFields extends React.Component {
         <DateInput
             label="When did you earn your high school diploma or equivalency certificate?"
             name="highSchoolOrGedCompletionDate"
-            day={day}
             month={month}
             year={year}
             onValueChange={(update) => {this.props.onStateChange('highSchoolOrGedCompletionDate', update);}}/>

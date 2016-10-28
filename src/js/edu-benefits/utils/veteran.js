@@ -100,7 +100,6 @@ export function createVeteran() {
     faaFlightCertificatesInformation: makeField(''),
     highSchoolOrGedCompletionDate: {
       month: makeField(''),
-      day: makeField(''),
       year: makeField(''),
     },
     seniorRotcCommissioned: makeField(''),

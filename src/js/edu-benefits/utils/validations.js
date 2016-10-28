@@ -116,6 +116,27 @@ function isValidDate(day, month, year) {
     date.getFullYear() === Number(year);
 }
 
+function isValidMonthYear(month, year) {
+  // Check to see if the month and year are either in the present or in the past.
+  // Follows the basic sanity checks above.
+  const nextMonth = Number(month);
+
+  // Surprisingly, this will parse correctly even if the month is greater than 12.
+  const date = new Date(year, nextMonth, 1);
+  const today = new Date();
+
+  if (today < date) {
+    return false;
+  }
+
+  if (Number(year) < 1900) {
+    return false;
+  }
+
+  return date.getMonth() === nextMonth % 12 &&
+    date.getFullYear() === Number(year);
+}
+
 function isValidName(value) {
   return /^[a-zA-Z][a-zA-Z '\-]*$/.test(value);
 }
@@ -172,6 +193,14 @@ function isBlankDateField(field) {
 
 function isValidDateField(field) {
   return isValidDate(field.day.value, field.month.value, field.year.value);
+}
+
+function isBlankMonthYearFields(field) {
+  return isBlank(field.month.value) && isBlank(field.year.value);
+}
+
+function isValidMonthYearFields(field) {
+  return isValidMonthYear(field.month.value, field.year.value);
 }
 
 function isValidFutureDate(day, month, year) {
@@ -284,7 +313,7 @@ function isValidEducationPeriod(data) {
 }
 
 function isValidEducationHistoryPage(data) {
-  return (isBlankDateField(data.highSchoolOrGedCompletionDate) || isValidDateField(data.highSchoolOrGedCompletionDate))
+  return (isBlankMonthYearFields(data.highSchoolOrGedCompletionDate) || isValidMonthYearFields(data.highSchoolOrGedCompletionDate))
     && data.postHighSchoolTrainings.every(isValidEducationPeriod);
 }
 
@@ -407,6 +436,7 @@ export {
   isBlank,
   isNotBlank,
   isValidDate,
+  isValidMonthYear,
   isValidName,
   isValidSSN,
   isValidMonetaryValue,
@@ -419,6 +449,7 @@ export {
   isValidRoutingNumber,
   isValidField,
   isValidDateField,
+  isValidMonthYearFields,
   isValidFutureOrPastDateField,
   isValidDateRange,
   isValidForm,

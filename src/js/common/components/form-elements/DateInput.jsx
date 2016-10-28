@@ -9,6 +9,8 @@ import ToolTip from './ToolTip';
 import { validateIfDirtyDate, isBlank, isValidDate, isValidAnyDate } from '../../utils/validations';
 import { months, days } from '../../utils/options-for-select.js';
 
+import { makeField } from '../../model/fields';
+
 /**
  * A form input with a label that can display error messages.
  *
@@ -20,7 +22,7 @@ import { months, days } from '../../utils/options-for-select.js';
  * `name` - string. Used to create unique name attributes for each input.
  * `toolTipText` - String with help text for user.
  * `tabIndex` - Number for keyboard tab order.
- * `day` - number. Value of day.
+ * `day` - number. Value of day.  If omitted, the component will only display month and year.
  * `month` - number. Value of month.
  * `year` - number. Value of year.
  * `onValueChange` - a function with this prototype: (newValue)
@@ -52,10 +54,15 @@ class DateInput extends React.Component {
     let errorSpanId;
     let errorSpan = '';
     let daysForSelectedMonth = [];
-    const day = this.props.day;
+    let day = this.props.day;
     const month = this.props.month;
     const year = this.props.year;
     const dateValidator = this.props.allowFutureDates ? isValidAnyDate : isValidDate;
+
+    if (!day) {
+      day = makeField('');
+      day.value = 1; // Assume first day of the month if none provided
+    }
 
     if (month.value) {
       daysForSelectedMonth = days[month.value];
@@ -89,6 +96,19 @@ class DateInput extends React.Component {
       requiredSpan = <span className="form-required-span">*</span>;
     }
 
+    // Only show day field if needed.
+    let dayField;
+    if (this.props.day) {
+      dayField = (<div className="form-datefield-day">
+        <ErrorableSelect errorMessage={isValid ? undefined : ''}
+            label="Day"
+            name={`${this.props.name}Day`}
+            options={daysForSelectedMonth}
+            value={this.props.day}
+            onValueChange={(update) => {this.handleChange('day', update);}}/>
+      </div>);
+    }
+
     return (
       <div>
         <label>
@@ -106,14 +126,7 @@ class DateInput extends React.Component {
                   value={this.props.month}
                   onValueChange={(update) => {this.handleChange('month', update);}}/>
             </div>
-            <div className="form-datefield-day">
-              <ErrorableSelect errorMessage={isValid ? undefined : ''}
-                  label="Day"
-                  name={`${this.props.name}Day`}
-                  options={daysForSelectedMonth}
-                  value={this.props.day}
-                  onValueChange={(update) => {this.handleChange('day', update);}}/>
-            </div>
+            {dayField}
             <div className="usa-datefield usa-form-group usa-form-group-year">
               <ErrorableNumberInput errorMessage={isValid ? undefined : ''}
                   label="Year"
@@ -142,7 +155,7 @@ DateInput.propTypes = {
   day: React.PropTypes.shape({
     value: React.PropTypes.string,
     dirty: React.PropTypes.bool,
-  }).isRequired,
+  }),
   month: React.PropTypes.shape({
     value: React.PropTypes.string,
     dirty: React.PropTypes.bool,
