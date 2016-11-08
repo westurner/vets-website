@@ -45,14 +45,7 @@ export default class ClaimPhase extends React.Component {
       case 'phase_entered':
         return (
           <div className="claims-evidence-item columns medium-9">
-            Your claim moved to {getHistoryPhaseDescription(this.props.phase)}
-          </div>
-        );
-
-      case 'micro_phase':
-        return (
-          <div className="claims-evidence-item columns medium-9">
-            Your claim moved to {getMicroPhaseDescription(event.phaseNumber)}
+            Your claim moved to {getMicroPhaseDescription(event.phase)}
           </div>
         );
 

@@ -1,3 +1,5 @@
+import _ from 'lodash/fp';
+
 const evidenceGathering = 'Evidence gathering, review, and decision';
 
 const phaseMap = {
@@ -59,7 +61,57 @@ export function getUserPhase(phase) {
   return phase - 3;
 }
 
+function getPhaseNumber(phaseStr) {
+  return parseInt(phaseStr.replace('phase', ''), 10);
+}
+
 export function groupTimelineActivity(events) {
+  const phases = {
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: []
+  };
+
+  const eventsCorrectedPhases = events
+    .filter(x => !!getSubmittedItemDate(x))
+    .map(event => {
+      if (event.type.startsWith('phase')) {
+        const phase = getPhaseNumber(event.type);
+        return {
+          type: 'phase_entered',
+          phase: phase + 1,
+          date: event.date
+        };
+      }
+
+      return event;
+    }
+  );
+
+  const [phase3Events, otherEvents] = _.partition((event) => {
+    return event.type.endsWith('_list') ||
+      event.type === 'phase_entered' && event.phase >= 3 && event.phase <= 6;
+  }, eventsCorrectedPhases);
+
+  phases[3] = phase3Events;
+  otherEvents.forEach(event => {
+    if (event.type === 'filed') {
+      phases[1].push(event);
+    } else if (event.type === 'completed') {
+      phases[5].push(event);
+    } else if (event.type === 'phase_entered') {
+      phases[event.phase].push(event);
+    } else {
+      console.log(`Missed event: ${event}`);
+    }
+  });
+
+  return phases;
+}
+
+export function groupTimelineActivityOld(events) {
   const phases = {};
   const phaseEvents = events;
   let activity = [];
