@@ -15,7 +15,7 @@
   // "Forked" modal styles
   &-split {
     .va-modal-inner {
-      min-width: 710px;
+      min-width: 640px;
 
       @media #{$small-only} {
         top: 0%;
@@ -32,7 +32,6 @@
     &-left,
     &-right {
       flex: 1;
-      padding: 0 20px;
       @media #{$small-only} {
         flex: none;
         padding: 0; 
@@ -43,6 +42,7 @@
     &-divider {
       background: $color-primary-alt-lightest;
       width: 3px;
+      margin: 0 20px;
 
       // Horizontally aligned "OR" divider for mobile
       @media #{$small-only} {
