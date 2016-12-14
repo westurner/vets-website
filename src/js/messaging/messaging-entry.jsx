@@ -10,7 +10,6 @@ import { store } from './store';
 import { updateRoute } from './actions';
 
 require('../common');  // Bring in the common javascript.
-require('../../sass/messaging/messaging.scss');
 
 require('../login/login-entry.jsx');
 

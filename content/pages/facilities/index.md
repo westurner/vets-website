@@ -4,7 +4,7 @@ layout: page-react.html
 entryname: facilities
 ---
 <link href="https://npmcdn.com/leaflet@1.0.0-rc.3/dist/leaflet.css" type="text/css" rel="stylesheet">
-<div id="main">
+<div id="main" class="entry-{{ entryname }}">
   <div class="section">
     <div id="react-root">
       <div class="loading-message">

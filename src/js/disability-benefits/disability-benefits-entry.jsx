@@ -14,7 +14,6 @@ import { setLastPage } from './actions';
 import { basename } from './utils/page';
 
 require('../common');  // Bring in the common javascript.
-require('../../sass/disability-benefits.scss');
 require('../login/login-entry.jsx');
 
 let store;

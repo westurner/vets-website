@@ -1,6 +1,3 @@
-// No-react styles.
-require('../sass/no-react.scss');
-
 require('./common');
 
 // Bring in foundation and custom libraries.

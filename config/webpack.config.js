@@ -18,7 +18,8 @@ const entryFiles = {
   rx: './src/js/rx/rx-entry.jsx',
   'no-react': './src/js/no-react-entry.js',
   'user-profile': './src/js/user-profile/user-profile-entry.jsx',
-  auth: './src/js/auth/auth-entry.jsx'
+  auth: './src/js/auth/auth-entry.jsx',
+  style: './src/sass/style.scss'
 };
 
 const configGenerator = (options) => {
@@ -112,6 +113,11 @@ const configGenerator = (options) => {
         $: 'jquery',
         jQuery: 'jquery',
         'window.jQuery': 'jquery'
+      }),
+
+      new webpack.DllReferencePlugin({
+        manifest: require('../dll/react-manifest.json'),
+        context: process.cwd()
       }),
 
       new ExtractTextPlugin('[name].css'),

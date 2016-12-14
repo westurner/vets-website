@@ -9,8 +9,6 @@ import routes from './routes';
 import { commonStore } from '../common/store';
 
 require('../common');  // Bring in the common javascript.
-require('../../sass/rx/rx.scss');
-require('../../sass/user-profile.scss');
 
 require('../login/login-entry.jsx');
 

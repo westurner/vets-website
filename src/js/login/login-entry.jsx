@@ -9,7 +9,6 @@ import { commonStore } from '../common/store';
 import Main from './containers/Main';
 
 require('../common');  // Bring in the common javascript.
-require('../../sass/login.scss');
 
 function init() {
   /*

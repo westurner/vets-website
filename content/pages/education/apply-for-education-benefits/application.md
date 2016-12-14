@@ -3,7 +3,7 @@ title: Apply for education benefits
 entryname: edu-benefits
 layout: page-react.html
 ---
-<div id="main">
+<div id="main" class="entry-{{ entryname }}">
   <nav class="va-nav-breadcrumbs">
     <ul class="row va-nav-breadcrumbs-list" role="menubar" aria-label="Primary">
       <li><a href="/">Home</a></li>

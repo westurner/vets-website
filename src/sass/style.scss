@@ -57,9 +57,13 @@
 @import 'modules/m-piano-key';
 @import 'modules/m-table';
 @import 'modules/m-button';
+@import 'modules/m-modal';
 @import 'modules/m-form-elements';
 @import 'modules/m-search';
 @import 'modules/m-loading-indicator';
+@import 'modules/m-progress-bar';
+@import 'modules/va-pagination';
+@import 'modules/m-form-process';
 
 // ----- VA STATE (ACTIVE BUTTONS/ERROR INPUTS) ---- //
 
@@ -69,3 +73,13 @@
 // ----- VA SHAME ---- //
 
 @import 'shame';
+
+// ----- APPLICATION STYLES ---- //
+
+@import 'auth';
+@import 'disability-benefits';
+@import 'login';
+@import 'messaging/messaging';
+@import 'rx/rx';
+@import 'user-profile';
+@import 'facility-locator'

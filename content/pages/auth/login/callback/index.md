@@ -4,7 +4,7 @@ layout: page-react.html
 entryname: auth
 ---
 
-<div id="main">
+<div id="main" class="entry-{{ entryname }}">
   <div class="section">
     <div id="react-root">
       <div class="loading-message">

@@ -10,7 +10,6 @@ import { commonStore } from '../common/store';
 
 
 require('../common');  // Bring in the common javascript.
-require('../../sass/auth.scss');
 
 function init() {
   /*

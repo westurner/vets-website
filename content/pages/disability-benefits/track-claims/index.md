@@ -3,7 +3,7 @@ title: Track Claims
 entryname: disability-benefits
 layout: page-react.html
 ---
-<div id="main">
+<div id="main" class="entry-{{ entryname }}">
   <div class="section">
     <div id="react-root">
       <div class="loading-message">

@@ -11,8 +11,6 @@ import initReact from '../common/init-react';
 import reducer from './reducers';
 import routes from './routes.jsx';
 
-require('../../sass/edu-benefits.scss');
-
 require('../login/login-entry.jsx');
 
 let store;
