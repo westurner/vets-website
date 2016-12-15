@@ -6,7 +6,7 @@ require('babel-core/register');
 
 const glob = require('glob');
 
-const selenium_server_port = process.env.SELENIUM_PORT || 4444;
+const selenium_server_port = 4444;
 
 module.exports = {
   src_folders: ['./test'],
