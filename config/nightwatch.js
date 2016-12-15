@@ -1,6 +1,7 @@
 /* eslint-disable camelcase, strict */
 'use strict';
 
+
 require('babel-core/register');
 
 const glob = require('glob');
