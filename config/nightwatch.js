@@ -44,7 +44,7 @@ module.exports = {
         waitForConditionPollInterval: 35,
       },
       selenium: {
-        start_process: true,
+        start_process: false,
         server_path:
             glob.sync('./node_modules/selenium-standalone/.selenium/selenium-server/*.jar')[0],
         log_path: './logs/selenium',
