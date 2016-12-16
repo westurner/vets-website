@@ -50,6 +50,12 @@ def buildDetails = { vars ->
   """.stripIndent()
 }
 
+def dockerCommandWithEnv = { command, env ->
+  def envc = ""
+  env.each { var ->  envc += "-e '${var}'" }
+  sh "docker run --rm -t -v `pwd`/build:/application/build ${envc} vets-website:build-${env.BUILD_NUMBER} ${command}"
+}
+
 pipeline {
   agent label: 'vets-website-linting'
 
@@ -67,7 +73,18 @@ pipeline {
 
       steps {
         checkout scm
+        sh 'mkdir build'
       }     
+    }
+
+    stage('Docker Image') {
+      when {
+        !isPushNotificationOnFeature() && !isContentTeamUpdate()
+      }
+
+      steps {
+        sh "docker build . -t vets-website:build-${env.BUILD_NUMBER}"
+      }
     }
 
     stage('Security') {
@@ -76,17 +93,7 @@ pipeline {
       }
 
       steps {
-        sh 'nsp check'
-      }
-    }
-
-    stage('Dependencies') {
-      when {
-        !isPushNotificationOnFeature() && !isContentTeamUpdate()
-      }
-
-      steps {
-        sh 'npm-cache install'
+        dockerCommandWithEnv("check", [:])
       }
     }
 
@@ -96,21 +103,9 @@ pipeline {
       }
 
       steps {
-        sh 'npm --no-color run lint:js'
-        sh 'npm --no-color run lint:sass'
+        dockerCommandWithEnv("lint", [:])
       }
     }
-
-    stage('DLL') {
-      when {
-        !isPushNotificationOnFeature() && !isContentTeamUpdate()
-      }
-
-      steps {
-        sh 'npm --no-color run build -- --dll-only'
-      }
-    }
-
 
     stage('Build') {
       when {
@@ -120,27 +115,21 @@ pipeline {
       steps {
         parallel(
           'development': {
-            withEnv(envs['development']) {
-              sh "rm -rf build/development"
-              sh "npm --no-color run build -- --buildtype development --site-only"
-              sh "echo \"${buildDetails('buildtype': 'development')}\" > build/development/BUILD.txt" 
-            }
+            sh "rm -rf build/development"
+            dockerCommandWithEnv("build", envs['development'])
+            sh "echo \"${buildDetails('buildtype': 'development')}\" > build/development/BUILD.txt" 
           },
 
           'staging': {
-            withEnv(envs['staging']) {
-              sh "rm -rf build/staging"
-              sh "npm --no-color run build -- --buildtype staging --site-only"
-              sh "echo \"${buildDetails('buildtype': 'staging')}\" > build/staging/BUILD.txt" 
-            }
+            sh "rm -rf build/staging"
+            dockerCommandWithEnv("build", envs['staging'])
+            sh "echo \"${buildDetails('buildtype': 'staging')}\" > build/staging/BUILD.txt" 
           },
 
           'production': {
-            withEnv(envs['production']) {
-              sh "rm -rf build/production"
-              sh "npm --no-color run build -- --buildtype production --site-only"
-              sh "echo \"${buildDetails('buildtype': 'production')}\" > build/production/BUILD.txt" 
-            }
+            sh "rm -rf build/production"
+            dockerCommandWithEnv("build", envs['production'])
+            sh "echo \"${buildDetails('buildtype': 'production')}\" > build/production/BUILD.txt" 
           }
         )
       }
@@ -154,33 +143,17 @@ pipeline {
       steps {
         parallel(
           'development': {
-            withEnv(envs['development']) {
-               sh "npm --no-color run test:unit"
-            }
+            dockerCommandWithEnv("test:unit", envs['development'])
           },
 
           'staging': {
-            withEnv(envs['staging']) {
-               sh "npm --no-color run test:unit"
-            }
+            dockerCommandWithEnv("test:unit", envs['staging'])
           },
 
           'production': {
-            withEnv(envs['production']) {
-              sh "npm --no-color run test:unit"
-            }
+            dockerCommandWithEnv("test:unit", envs['production'])
           }
         ) 
-      }
-    }
-
-    stage('Selenium') {
-      when {
-        !isPushNotificationOnFeature() && !isContentTeamUpdate() && !isProtectedMergePreviouslyTested()
-      }
-
-      steps {
-        sh "npm --no-color run selenium:bootstrap"
       }
     }
 
@@ -192,21 +165,15 @@ pipeline {
       steps {
         parallel(
           'development': {
-            withEnv(envs['development']) {
-               sh "npm --no-color run test:e2e"
-            }
+            dockerCommandWithEnv("test:e2e", envs['development'])
           },
 
           'staging': {
-            withEnv(envs['staging']) {
-               sh "npm --no-color run test:e2e"
-            }
+            dockerCommandWithEnv("test:e2e", envs['staging'])
           },
 
           'production': {
-            withEnv(envs['production']) {
-              sh "npm --no-color run test:e2e"
-            }
+            dockerCommandWithEnv("test:e2e", envs['production'])
           }
         )
       }
@@ -218,9 +185,7 @@ pipeline {
       }
 
       steps {
-        withEnv(envs['development']) {
-           sh "npm --no-color run test:accessibility"
-        }
+        dockerCommandWithEnv("test:accessibility", envs['development'])
       }
     }
   }
