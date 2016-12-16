@@ -53,7 +53,7 @@ def buildDetails = { vars ->
 def dockerCommandWithEnv = { command, env ->
   def envc = ""
   env.each { var ->  envc += "-e '${var}'" }
-  sh "docker run --rm -t -v `pwd`/build:/application/build ${envc} vets-website:build-${env.BUILD_NUMBER} ${command}"
+  "docker run --rm -t -v `pwd`/build:/application/build ${envc} vets-website:build-${env.BUILD_NUMBER} ${command}"
 }
 
 pipeline {
@@ -93,7 +93,7 @@ pipeline {
       }
 
       steps {
-        dockerCommandWithEnv("check", [:])
+        sh dockerCommandWithEnv("check", [:])
       }
     }
 
@@ -103,7 +103,7 @@ pipeline {
       }
 
       steps {
-        dockerCommandWithEnv("lint", [:])
+        sh dockerCommandWithEnv("lint", [:])
       }
     }
 
@@ -116,19 +116,19 @@ pipeline {
         parallel(
           'development': {
             sh "rm -rf build/development"
-            dockerCommandWithEnv("build", envs['development'])
+            sh dockerCommandWithEnv("build", envs['development'])
             sh "echo \"${buildDetails('buildtype': 'development')}\" > build/development/BUILD.txt" 
           },
 
           'staging': {
             sh "rm -rf build/staging"
-            dockerCommandWithEnv("build", envs['staging'])
+            sh dockerCommandWithEnv("build", envs['staging'])
             sh "echo \"${buildDetails('buildtype': 'staging')}\" > build/staging/BUILD.txt" 
           },
 
           'production': {
             sh "rm -rf build/production"
-            dockerCommandWithEnv("build", envs['production'])
+            sh dockerCommandWithEnv("build", envs['production'])
             sh "echo \"${buildDetails('buildtype': 'production')}\" > build/production/BUILD.txt" 
           }
         )
@@ -143,15 +143,15 @@ pipeline {
       steps {
         parallel(
           'development': {
-            dockerCommandWithEnv("test:unit", envs['development'])
+            sh dockerCommandWithEnv("test:unit", envs['development'])
           },
 
           'staging': {
-            dockerCommandWithEnv("test:unit", envs['staging'])
+            sh dockerCommandWithEnv("test:unit", envs['staging'])
           },
 
           'production': {
-            dockerCommandWithEnv("test:unit", envs['production'])
+            sh dockerCommandWithEnv("test:unit", envs['production'])
           }
         ) 
       }
@@ -165,15 +165,15 @@ pipeline {
       steps {
         parallel(
           'development': {
-            dockerCommandWithEnv("test:e2e", envs['development'])
+            sh dockerCommandWithEnv("test:e2e", envs['development'])
           },
 
           'staging': {
-            dockerCommandWithEnv("test:e2e", envs['staging'])
+            sh dockerCommandWithEnv("test:e2e", envs['staging'])
           },
 
           'production': {
-            dockerCommandWithEnv("test:e2e", envs['production'])
+            sh dockerCommandWithEnv("test:e2e", envs['production'])
           }
         )
       }
@@ -185,7 +185,7 @@ pipeline {
       }
 
       steps {
-        dockerCommandWithEnv("test:accessibility", envs['development'])
+        sh dockerCommandWithEnv("test:accessibility", envs['development'])
       }
     }
   }
