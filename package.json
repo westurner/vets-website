@@ -143,6 +143,7 @@
     "reactable": "^0.14.0",
     "redbox-react": "^1.2.10",
     "redux": "^3.5.2",
+    "redux-form": "^6.3.2",
     "redux-thunk": "^2.1.0",
     "resolve-url-loader": "^1.6.0",
     "sass-lint": "^1.8.2",

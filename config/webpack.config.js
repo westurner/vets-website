@@ -134,7 +134,6 @@ const configGenerator = (options) => {
       loader: 'null'
     });
 
-    baseConfig.plugins.push(new webpack.optimize.DedupePlugin());
     baseConfig.plugins.push(new webpack.optimize.OccurrenceOrderPlugin(true));
     baseConfig.plugins.push(new webpack.optimize.UglifyJsPlugin());
   } else {

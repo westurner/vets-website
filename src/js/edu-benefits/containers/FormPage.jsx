@@ -1,8 +1,10 @@
 import React from 'react';
+import Scroll from 'react-scroll';
 
-import { connect } from 'react-redux';
+import { reduxForm } from 'redux-form';
+import { withRouter } from 'react-router';
+import NavButtons from '../components/form-elements/NavButtons.jsx';
 
-import { veteranUpdateField, ensureFieldsInitialized } from '../actions/index';
 import { focusElement } from '../../common/utils/helpers';
 
 function focusForm() {
@@ -14,42 +16,55 @@ function focusForm() {
   }
 }
 
+const scrollToFirstError = () => {
+  setTimeout(() => {
+    const errorEl = document.querySelector('.usa-input-error, .input-error-date');
+    if (errorEl) {
+      const position = errorEl.getBoundingClientRect().top + document.body.scrollTop;
+      Scroll.animateScroll.scrollTo(position - 10, {
+        duration: 500,
+        delay: 0,
+        smooth: true
+      });
+      focusElement(errorEl);
+    }
+  }, 100);
+};
+
 class FormPage extends React.Component {
   componentDidMount() {
     focusForm();
   }
   componentDidUpdate(prevProps) {
-    if (this.props.Fields !== prevProps.Fields) {
+    if (this.props.route.Fields !== prevProps.route.Fields) {
       focusForm();
     }
   }
   render() {
-    const { data, onStateChange, dirtyFields, Fields } = this.props;
+    const name = this.props.route.name;
+    const Fields = this.props.route.fieldsComponent;
+    const router = this.props.router;
+    const formPage = (props) => {
+      return (
+        <div>
+          <div className="form-panel">
+            <Fields/>
+          </div>
+          <NavButtons
+              onForward={props.handleSubmit}
+              onBack={() => router.push(this.findNeighbor)}/>
+        </div>
+      );
+    };
 
-    return (
-      <div className="form-panel">
-        <Fields data={data} onStateChange={onStateChange} initializeFields={dirtyFields}/>
-      </div>
-    );
+    const ConnectedPage = reduxForm({
+      form: name,
+      destroyOnUnmount: false,
+      onSubmitFail: scrollToFirstError,
+      onSubmit: () => router.push('/benefits-eligibility/benefits-selection')
+    })(formPage);
+    return <ConnectedPage/>;
   }
 }
 
-function mapStateToProps(state, ownProps) {
-  return {
-    data: state.veteran,
-    Fields: ownProps.route.fieldsComponent
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    onStateChange(...args) {
-      dispatch(veteranUpdateField(...args));
-    },
-    dirtyFields(...args) {
-      dispatch(ensureFieldsInitialized(...args));
-    }
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(FormPage);
+export default withRouter(FormPage);

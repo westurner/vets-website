@@ -13,6 +13,17 @@ function validateIfDirty(field, validator) {
   return true;
 }
 
+function withParsedDate(validator) {
+  return (date) => {
+    if (date) {
+      const dateObj = JSON.parse(date);
+      return validator(dateObj.month, dateObj.day, dateObj.year);
+    }
+
+    return false;
+  };
+}
+
 function validateIfDirtyDate(dayField, monthField, yearField, validator) {
   if (dayField.dirty && monthField.dirty && yearField.dirty) {
     return validator(dayField.value, monthField.value, yearField.value);
@@ -462,5 +473,6 @@ export {
   isValidEmploymentPeriod,
   isValidRotcScholarshipAmount,
   isValidPartialMonthYearRange,
-  isValidEducationPeriod
+  isValidEducationPeriod,
+  withParsedDate
 };

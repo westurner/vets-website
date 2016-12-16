@@ -49,7 +49,7 @@ function isBlank(value) {
 }
 
 function isNotBlank(value) {
-  return value !== '';
+  return value !== '' && value !== undefined;
 }
 
 function isNotBlankDateField(field) {
@@ -151,7 +151,7 @@ function isValidPartialMonthYearInPast(month, year) {
   return !year || isValidPartialMonthYear(month, year) && momentDate.isValid() && momentDate.isSameOrBefore(moment().startOf('month'));
 }
 
-function isValidDateOver17(day, month, year) {
+function isValidDateOver17(month, day, year) {
   if (!isValidYear(year)) {
     return false;
   }

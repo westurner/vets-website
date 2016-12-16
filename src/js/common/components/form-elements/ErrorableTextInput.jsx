@@ -40,6 +40,9 @@ class ErrorableTextInput extends React.Component {
 
   handleBlur() {
     this.props.onValueChange(makeField(this.props.field.value, true));
+    if (this.props.onBlur) {
+      this.props.onBlur();
+    }
   }
 
   render() {
