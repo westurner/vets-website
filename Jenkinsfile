@@ -1,30 +1,14 @@
-import java.util.Random
-
-// Define a series of ports for services required by the test run for each build type.
-
-
-def random = new Random()
-
-def port = { random.nextInt(997) + 26000 }
-def startPort = port()
 def envNames = ['development', 'staging', 'production']
 def envs = [:]
 
 // Define build environments for each build type.
 // Some useful branch-api-plugin env docs: https://github.com/jglick/branch-api-plugin/blob/fe9b02af870105954f978b52faab2669c787dc9f/src/main/resources/jenkins/branch/BranchNameContributor/buildEnv.properties
 
-for (int i = 0; i < envNames.size(); i++) {
-  def env = [
-    "API_PORT=${startPort}",
-    "WEB_PORT=${startPort + 1}",
-    "SELENIUM_PORT=${startPort + 2}",
+envNames.each { envName ->
+  envs[envName] = [
     "NODE_ENV=production",
-    "BUILDTYPE=${envNames.get(i)}"
+    "BUILDTYPE=${envName}"
   ]
-
-  envs.put(envNames.get(i), env)
-
-  startPort += 3
 }
 
 def isPushNotificationOnFeature = {
