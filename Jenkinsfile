@@ -74,7 +74,7 @@ pipeline {
 
       steps {
         checkout scm
-        sh 'mkdir build'
+        sh 'mkdir -p build'
       }     
     }
 
