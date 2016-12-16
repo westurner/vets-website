@@ -18,35 +18,15 @@ const scrollToTop = () => {
 export default class NavButtons extends React.Component {
   constructor(props) {
     super(props);
-    this.handleContinue = this.handleContinue.bind(this);
-    this.findNeighbor = this.findNeighbor.bind(this);
-    this.goBack = this.goBack.bind(this);
     this.goForward = this.goForward.bind(this);
-  }
-  handleContinue(data) {
-    const nextPath = this.findNeighbor(data, 1);
-    this.props.onNavigate(nextPath);
-    scrollToTop();
-    // scrollToFirstError();
-  }
-  goBack() {
-    this.props.onNavigate(this.findNeighbor(-1));
-    scrollToTop();
   }
   goForward() {
     this.props.onForward();
   }
-  findNeighbor(data, increment) {
-    const { pages, path } = this.props;
-    const filtered = getActivePages(pages, data);
-    const currentIndex = filtered.map(page => page.name).indexOf(path);
-    const index = currentIndex + increment;
-    return filtered[index].name;
-  }
   render() {
     const backButton = (
       <ProgressButton
-          onButtonClick={this.goBack}
+          onButtonClick={this.props.onBack}
           buttonText="Back"
           buttonClass="usa-button-outline"
           beforeText="«"/>

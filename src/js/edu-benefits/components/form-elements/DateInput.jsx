@@ -65,7 +65,6 @@ export default class DateInput extends React.Component {
           <div className="usa-date-of-birth row">
             <div className="form-datefield-month">
               <Select
-                  autoComplete="false"
                   label="Month"
                   name="month"
                   options={months}

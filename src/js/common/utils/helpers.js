@@ -56,6 +56,22 @@ export function getActivePages(pages, data) {
   return pages.filter(page => isActivePage(page, data));
 }
 
+function findNeighbor(increment, data, path, pages) {
+  const filtered = getActivePages(pages, data);
+  const currentIndex = filtered.map(page => page.name).indexOf(path);
+  const index = currentIndex + increment;
+  return filtered[index].name;
+}
+
+export function getNextPage(formData, path, pages) {
+  return findNeighbor(1, formData, path, pages);
+}
+
+export function getPreviousPage(formData, path, pages) {
+  debugger;
+  return findNeighbor(-1, formData, path, pages);
+}
+
 export function dateToMoment(dateField) {
   return moment({
     year: dateField.year.value,

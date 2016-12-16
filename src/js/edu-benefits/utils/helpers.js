@@ -82,6 +82,9 @@ export function showSomeoneElseServiceQuestion(claimType) {
 }
 
 export function hasServiceBefore1978(data) {
+  if (!data || !data.toursOfDuty) {
+    return false;
+  }
   return data.toursOfDuty.some(tour => {
     const fromDate = dateToMoment(tour.dateRange.from);
     return fromDate.isValid() && fromDate.isBefore('1978-01-02');

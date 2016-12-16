@@ -74,19 +74,6 @@ class EduBenefitsApp extends React.Component {
           <div className="progress-box">
             <NavHeader path={currentLocation.pathname} chapters={chapters} className="show-for-small-only"/>
             {this.props.children}
-            <NavButtons
-                data={data}
-                submission={submission}
-                pages={pages}
-                path={currentLocation.pathname}
-                isValid={isValidPage(currentLocation.pathname, data)}
-                canSubmit={isValidForm(data)}
-                dirtyPage={dirtyPage}
-                onNavigate={navigateTo}
-                onComplete={setComplete}
-                onSubmit={onSubmit}
-                onStateChange={onStateChange}
-                onAttemptedSubmit={onAttemptedSubmit}/>
           </div>
         </div>
         <span className="js-test-location hidden" data-location={currentLocation.pathname} hidden></span>
