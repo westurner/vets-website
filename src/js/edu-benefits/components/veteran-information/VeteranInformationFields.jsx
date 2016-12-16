@@ -22,9 +22,3 @@ export default class PersonalInformationFields extends React.Component {
     );
   }
 }
-
-PersonalInformationFields.propTypes = {
-  onStateChange: React.PropTypes.func.isRequired,
-  data: React.PropTypes.object.isRequired
-};
-
