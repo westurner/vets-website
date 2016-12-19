@@ -71,9 +71,9 @@ export function getPreviousPage(formData, path, pages) {
 
 export function dateToMoment(dateField) {
   return moment({
-    year: dateField.year.value,
-    month: dateField.month.value ? parseInt(dateField.month.value, 10) - 1 : '',
-    day: dateField.day ? dateField.day.value : null
+    year: dateField.year,
+    month: dateField.month ? parseInt(dateField.month, 10) - 1 : '',
+    day: dateField.day ? dateField.day : null
   });
 }
 

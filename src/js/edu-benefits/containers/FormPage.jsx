@@ -1,5 +1,6 @@
 import React from 'react';
 import Scroll from 'react-scroll';
+import { connect } from 'react-redux';
 
 import { reduxForm } from 'redux-form';
 import { withRouter } from 'react-router';
@@ -37,7 +38,7 @@ const formPage = (fieldsComponent, getState, path, router) => (props) => {
   return (
     <div>
       <div className="form-panel">
-        <Fields/>
+        <Fields {...props}/>
       </div>
       <NavButtons
           onForward={props.handleSubmit}
@@ -51,7 +52,7 @@ class FormPage extends React.Component {
     focusForm();
   }
   componentWillReceiveProps(newProps) {
-    if (this.props.route.name !== newProps.route.name) {
+    if (this.props.route.form !== newProps.route.form) {
       this.connectedPage = null;
     }
   }
@@ -65,14 +66,20 @@ class FormPage extends React.Component {
     const getState = this.context.store.getState;
     const formName = this.props.route.form;
     const router = this.props.router;
+    const fieldsComponent = this.props.route.fieldsComponent;
     // Doing this to cache the component so it doesn't re-render too much
     if (!this.connectedPage) {
       this.connectedPage = reduxForm({
         form: formName,
+        initialValues: fieldsComponent.getInitialValues ? fieldsComponent.getInitialValues() : undefined,
         destroyOnUnmount: false,
         onSubmitFail: scrollToFirstError,
         onSubmit: () => router.push(getNextPage(getState().form, this.props.route.path, pages))
       })(formPage(this.props.route.fieldsComponent, getState, this.props.route.path, router));
+
+      if (fieldsComponent.formDataSelector) {
+        this.connectedPage = connect(state => fieldsComponent.formDataSelector(state.form))(this.connectedPage);
+      }
     }
     const ConnectedPage = this.connectedPage;
     return <ConnectedPage/>;

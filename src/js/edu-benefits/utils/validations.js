@@ -266,8 +266,11 @@ function isValidBenefitsInformationPage(data) {
   return data.chapter33 || data.chapter30 || data.chapter32 || data.chapter1606;
 }
 
-function isValidRelinquishedDate(field) {
-  if (!isValidYear(field.year.value)) {
+function isValidRelinquishedDate(field, isShown) {
+  if (!isShown) {
+    return true;
+  }
+  if (!isValidYear(field.year)) {
     return false;
   }
   // Allow dates up to two years ago

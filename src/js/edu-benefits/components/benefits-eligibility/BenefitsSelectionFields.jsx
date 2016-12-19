@@ -17,7 +17,7 @@ export default class BenefitsSelectionFields extends React.Component {
             </ul>
           </div>
         </div>
-        <BenefitsChosen name="benefitsChosen"/>
+        <BenefitsChosen name="benefitsChosen" required/>
       </div>
     </fieldset>
     );

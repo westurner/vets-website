@@ -1,24 +1,43 @@
 import React from 'react';
+import _ from 'lodash/fp';
+import moment from 'moment';
 
-import ErrorableRadioButtons from '../../../common/components/form-elements/ErrorableRadioButtons';
-import ErrorableDate from '../../../common/components/form-elements/ErrorableDate';
-import { validateIfDirty, isNotBlank, isValidRelinquishedDate } from '../../utils/validations';
+import { isValidRelinquishedDate } from '../../utils/validations';
 import { relinquishableBenefits } from '../../utils/options-for-select';
 import { showRelinquishedEffectiveDate } from '../../utils/helpers';
 
+import FieldDate from '../form-elements/FieldDate';
+import FieldRadioButtons from '../form-elements/FieldRadioButtons';
+
 export default class BenefitsRelinquishmentFields extends React.Component {
+  static formDataSelector(formState) {
+    return {
+      benefitsRelinquished: _.get('benefitsRelinquishment.values.benefitsRelinquished', formState),
+      benefitsChosen: _.get('benefitsSelection.values.benefitsChosen', formState)
+    };
+  }
+  static getInitialValues() {
+    const today = moment();
+    return {
+      benefitsRelinquishedDate: JSON.stringify({
+        month: (today.month() + 1).toString(),
+        day: today.date().toString(),
+        year: today.year().toString()
+      })
+    };
+  }
   render() {
+    const { benefitsRelinquished, benefitsChosen } = this.props;
+    const choseChapter33 = benefitsChosen && benefitsChosen.some(ben => ben === 'chapter33');
     const dateFields = (
       <div>
-        <ErrorableDate required={showRelinquishedEffectiveDate(this.props.data.benefitsRelinquished.value)}
-            validation={{
-              valid: isValidRelinquishedDate(this.props.data.benefitsRelinquishedDate),
+        <FieldDate required={showRelinquishedEffectiveDate(benefitsRelinquished)}
+            validation={[{
+              validator: (field) => isValidRelinquishedDate(field, showRelinquishedEffectiveDate(benefitsRelinquished)),
               message: 'Date cannot be earlier than 2 years ago'
-            }}
+            }]}
             label="Effective date"
-            name="benefitsRelinquishedDate"
-            date={this.props.data.benefitsRelinquishedDate}
-            onValueChange={(update) => {this.props.onStateChange('benefitsRelinquishedDate', update);}}/>
+            name="benefitsRelinquishedDate"/>
         <div>
           <ul>
             <li>Use today’s date unless you aren’t going to use your Post 9/11 GI Bill benefits until later.</li>
@@ -57,14 +76,11 @@ export default class BenefitsRelinquishmentFields extends React.Component {
       <div className="input-section">
         <p>Because you chose to apply for your Post-9/11 benefit, you have to relinquish (give up) 1 other benefit you may be eligible for. <br/> <strong>Your decision is irrevocable</strong> (you can’t change your mind).</p>
         <fieldset className="edu-benefits-info-no-icon">
-          <ErrorableRadioButtons
-              required={this.props.data.chapter33}
-              errorMessage={validateIfDirty(this.props.data.benefitsRelinquished, isNotBlank) ? '' : 'Please select a response'}
+          <FieldRadioButtons
+              required={choseChapter33}
               label="I choose to give up:"
               name="benefitsRelinquished"
-              options={options}
-              value={this.props.data.benefitsRelinquished}
-              onValueChange={(update) => { this.props.onStateChange('benefitsRelinquished', update); }}/>
+              options={options}/>
         </fieldset>
         <p>If you have questions or don’t understand the choice, talk to a specialist at 1-888-442-4551 (1-888-GI-BILL-1) from 8:00 a.m. - 7:00 p.m. ET Mon - Fri.</p>
       </div>
@@ -72,8 +88,3 @@ export default class BenefitsRelinquishmentFields extends React.Component {
     );
   }
 }
-
-BenefitsRelinquishmentFields.propTypes = {
-  onStateChange: React.PropTypes.func.isRequired,
-  data: React.PropTypes.object.isRequired
-};
