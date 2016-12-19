@@ -63,12 +63,12 @@ class FormPage extends React.Component {
   render() {
     // Yes, this is hack
     const getState = this.context.store.getState;
-    const name = this.props.route.name;
+    const formName = this.props.route.form;
     const router = this.props.router;
     // Doing this to cache the component so it doesn't re-render too much
     if (!this.connectedPage) {
       this.connectedPage = reduxForm({
-        form: name,
+        form: formName,
         destroyOnUnmount: false,
         onSubmitFail: scrollToFirstError,
         onSubmit: () => router.push(getNextPage(getState().form, this.props.route.path, pages))

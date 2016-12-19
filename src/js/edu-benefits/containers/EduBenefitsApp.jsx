@@ -86,7 +86,7 @@ function mapStateToProps(state, ownProps) {
   return {
     pageState: state.uiState.pages,
     currentLocation: ownProps.location,
-    data: state.veteran,
+    data: state.form,
     submission: state.uiState.submission,
     router: ownProps.router
   };

@@ -5,7 +5,8 @@ export function getPageList(routes) {
   return routes.map(route => {
     const obj = {
       name: route.props.path,
-      label: route.props.name
+      label: route.props.name,
+      form: route.props.form
     };
     if (route.props.depends) {
       obj.depends = route.props.depends;
@@ -21,7 +22,8 @@ export function groupPagesIntoChapters(routes) {
       const obj = {
         name: page.props.name,
         chapter: page.props.chapter,
-        path: page.props.path
+        path: page.props.path,
+        form: page.props.form
       };
 
       if (page.props.depends) {
@@ -45,11 +47,7 @@ export function isActivePage(page, data) {
     return page.depends(data);
   }
 
-  if (Array.isArray(page.depends)) {
-    return page.depends.some(condition => _.matches(condition)(data));
-  }
-
-  return page.depends === undefined || _.matches(page.depends)(data);
+  return true;
 }
 
 export function getActivePages(pages, data) {
@@ -68,7 +66,6 @@ export function getNextPage(formData, path, pages) {
 }
 
 export function getPreviousPage(formData, path, pages) {
-  debugger;
   return findNeighbor(-1, formData, path, pages);
 }
 
