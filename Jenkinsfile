@@ -39,19 +39,26 @@ def buildDetails = { vars ->
   """.stripIndent()
 }
 
+def dockerImage = "vets-website:${env.BUILD_TAG}"
+
 def dockerCommandWithEnv = { command, env ->
   def envc = ""
   env.each { var ->  envc += "'${var}' " }
-  "${envc}${command}"
+
+  docker.image(dockerImage).inside {
+    sh "${envc}${command}"
+  }
 }
 
 node('vets-website-linting') {
   checkout scm
 
-  docker.build "vets-website:${env.BUILD_TAG}"
-
-  docker.image("vets-website:${env.BUILD_TAG}").inside {
-    sh "nsp check"
+  if (isPushNotificationOnFeature()) {
+    return
   }
+
+  docker.build dockerImage
+
+  dockerCommandWithEnv('npm run build -- --buildtype=development', envs['development'])
 }
 
