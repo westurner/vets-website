@@ -57,13 +57,13 @@ node('vets-website-linting') {
 
   stage('Security') {
     dockerImage.inside(userArgs) {
-      sh "nsp check" 
+      sh "cd /application && nsp check" 
     }
   }
 
   stage('Lint') {
     dockerImage.inside(userArgs) {
-      sh "npm run lint"
+      sh "cd /application && npm run lint"
     }
   }
 
@@ -74,9 +74,9 @@ node('vets-website-linting') {
       def envName = envNames.get(i)
 
       builds[envName] = {
-        dockerImage.inside("-u root:root") {
+        dockerImage.inside(userArgs) {
           sh "cd /application && npm run build -- --buildtype=${envName}"
-          sh "echo \"${buildDetails('buildtype': envName)}\" > build/${envName}/BUILD.txt" 
+          sh "cd /application && echo \"${buildDetails('buildtype': envName)}\" > build/${envName}/BUILD.txt" 
         }
       }
     }
