@@ -92,7 +92,6 @@ pipeline {
       }
     }
 
-/*
     stage('Lint') {
       when {
         !isPushNotificationOnFeature() && !isContentTeamUpdate()
@@ -104,7 +103,7 @@ pipeline {
         }
       }
     }
-
+/*
     stage('Build') {
       when {
         !isPushNotificationOnFeature() && !isContentTeamUpdate()
