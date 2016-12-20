@@ -46,6 +46,8 @@ def dockerCommandWithEnv = { command, env ->
 }
 
 node('vets-website-linting') {
+  checkout scm
+
   docker.build "vets-website:${env.BUILD_TAG}"
 
   docker.image("vets-website:${env.BUILD_TAG}").inside {
