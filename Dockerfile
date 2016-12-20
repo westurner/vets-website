@@ -12,5 +12,3 @@ RUN npm install
 RUN npm run selenium:bootstrap
 
 COPY . .
-
-#ENTRYPOINT ["/application/docker-entrypoint.sh"]

@@ -308,6 +308,9 @@ const buildSite = () => {
   });
 };
 
+buildSite();
+
+/*
 if (options['site-only'] || !options['dll-only']) {
   buildSite();
 } else {
@@ -319,3 +322,4 @@ if (options['site-only'] || !options['dll-only']) {
     }
   });
 }
+*/

@@ -115,10 +115,10 @@ const configGenerator = (options) => {
         'window.jQuery': 'jquery'
       }),
 
-      new webpack.DllReferencePlugin({
+      /*new webpack.DllReferencePlugin({
         manifest: require('../dll/react-manifest.json'),
         context: process.cwd()
-      }),
+      }),*/
 
       new ExtractTextPlugin('[name].css'),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
