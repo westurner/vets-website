@@ -55,7 +55,7 @@ node('vets-website-linting') {
 
   stage('Build') {
     dockerImage.inside {
-      sh "npm run build -- --buildtype=development"
+      sh "cd /application && npm run build -- --buildtype=development"
     }
   }
 }
