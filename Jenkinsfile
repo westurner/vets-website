@@ -53,6 +53,19 @@ node('vets-website-linting') {
   checkout scm
 
   def dockerImage = docker.build("vets-website:${env.BUILD_TAG}")
+  def userArgs = "-u root:root"
+
+  stage('Security') {
+    dockerImage.inside(userArgs) {
+      sh "nsp check" 
+    }
+  }
+
+  stage('Lint') {
+    dockerImage.inside(userArgs) {
+      sh "npm run lint"
+    }
+  }
 
   stage('Build') {
     def builds = [:]
@@ -63,10 +76,49 @@ node('vets-website-linting') {
       builds[envName] = {
         dockerImage.inside("-u root:root") {
           sh "cd /application && npm run build -- --buildtype=${envName}"
+          sh "echo \"${buildDetails('buildtype': envName)}\" > build/${envName}/BUILD.txt" 
         }
       }
     }
 
     parallel builds
+  }
+
+  stage('Unit') {
+    def builds = [:]
+
+    for (int i=0; i<envNames.size(); i++) {
+      def envName = envNames.get(i)
+
+      builds[envName] = {
+        dockerImage.inside(userArgs) {
+          sh "BUILDTYPE=${envName} && cd /application && npm run test:unit"
+        }
+      }
+    }
+
+    parallel builds
+  }
+
+  stage('E2E') {
+    def builds = [:]
+
+    for (int i=0; i<envNames.size(); i++) {
+      def envName = envNames.get(i)
+
+      builds[envName] = {
+        dockerImage.inside(userArgs) {
+          sh "BUILDTYPE=${envName} && cd /application && npm run test:e2e"
+        }
+      }
+    }
+
+    parallel builds
+  }
+
+  stage('Accessibility') {
+    dockerImage.inside(userArgs) {
+      sh "BUILDTYPE=development && cd /application && npm run test:accessibility"
+    }
   }
 }
