@@ -71,7 +71,9 @@ pipeline {
       }
 
       steps {
-        docker.build "vets-website:${env.BUILD_TAG}"
+        script {
+          docker.build "vets-website:${env.BUILD_TAG}"
+        }
       }
     }
 
