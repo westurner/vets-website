@@ -55,7 +55,7 @@ node('vets-website-linting') {
   sh "mkdir build"
 
   def dockerImage = docker.build("vets-website:${env.BUILD_TAG}")
-  def args = "-u root:root -v `pwd()`/build:/application/build -w /application"
+  def args = "-u root:root -v ${pwd()}/build:/application/build -w /application"
 
   stage('Security') {
     dockerImage.inside(args) {
