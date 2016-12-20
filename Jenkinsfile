@@ -54,7 +54,7 @@ node('vets-website-linting') {
   def dockerImage = docker.build("vets-website:${env.BUILD_TAG}")
 
   stage('Build') {
-    dockerImage.inside {
+    dockerImage.inside("-u root:root") {
       sh "cd /application && npm run build -- --buildtype=development"
     }
   }
