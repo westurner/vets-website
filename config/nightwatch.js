@@ -51,8 +51,8 @@ module.exports = {
         },
       },
       test_workers: {
-        enabled: false,
-        workers: 8,
+        enabled: true,
+        workers: 4,
       },
     },
 
@@ -69,8 +69,8 @@ module.exports = {
         'phantomjs.binary.path': require('phantomjs-prebuilt').path
       },
       test_workers: {
-        enabled: false,
-        workers: 8,
+        enabled: true,
+        workers: 4,
       },
     }
   }
