@@ -180,7 +180,9 @@ pipeline {
         )
       }
     }
+*/
 
+/*
     stage('Accessibility') {
       when {
         !isPushNotificationOnFeature() && !isContentTeamUpdate() && !isProtectedMergePreviouslyTested()
@@ -190,6 +192,6 @@ pipeline {
         sh dockerCommandWithEnv("test:accessibility", envs['development'])
       }
     }
-  }
 */
+  }
 }
