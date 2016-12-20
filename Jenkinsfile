@@ -100,7 +100,7 @@ pipeline {
       steps {
         script {
           docker.image("vets-website:${env.BUILD_TAG}").inside {
-            sh "npm run lint"
+            sh "echo 'hello'"
           }
         }
       }
