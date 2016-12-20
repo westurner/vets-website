@@ -81,12 +81,15 @@ pipeline {
       }
 
       steps {
-        docker.image("vets-website:${env.BUILD_TAG}").inside {
-          sh "nsp check"
+        script { 
+          docker.image("vets-website:${env.BUILD_TAG}").inside {
+            sh "nsp check"
+          }
         }
       }
     }
 
+/*
     stage('Lint') {
       when {
         !isPushNotificationOnFeature() && !isContentTeamUpdate()
@@ -157,7 +160,7 @@ pipeline {
         ) 
       }
     }
-
+*/
 /*
     stage('E2E') {
       when {
