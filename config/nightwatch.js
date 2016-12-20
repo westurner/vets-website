@@ -52,7 +52,7 @@ module.exports = {
       },
       test_workers: {
         enabled: false,
-        workers: 4,
+        workers: 8,
       },
     },
 
@@ -67,7 +67,11 @@ module.exports = {
         acceptSslCerts: true,
         webStorageEnabled: true,
         'phantomjs.binary.path': require('phantomjs-prebuilt').path
-      }
+      },
+      test_workers: {
+        enabled: false,
+        workers: 8,
+      },
     }
   }
 };
