@@ -70,7 +70,7 @@ pipeline {
       }
 
       steps {
-        sh "docker build . -t vets-website:build-${env.BUILD_NUMBER}"
+        sh "docker build -t vets-website:build-${env.BUILD_NUMBER} ."
       }
     }
 
