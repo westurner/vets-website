@@ -52,18 +52,20 @@ def dockerCommandWithEnv = { command, env ->
 node('vets-website-linting') {
   checkout scm
 
+  sh "mkdir build"
+
   def dockerImage = docker.build("vets-website:${env.BUILD_TAG}")
-  def userArgs = "-u root:root"
+  def args = "-u root:root -v `pwd()`/build:/application/build -w /application"
 
   stage('Security') {
-    dockerImage.inside(userArgs) {
-      sh "cd /application && nsp check" 
+    dockerImage.inside(args) {
+      sh "nsp check" 
     }
   }
 
   stage('Lint') {
-    dockerImage.inside(userArgs) {
-      sh "cd /application && npm run lint"
+    dockerImage.inside(args) {
+      sh "npm run lint"
     }
   }
 
@@ -74,9 +76,9 @@ node('vets-website-linting') {
       def envName = envNames.get(i)
 
       builds[envName] = {
-        dockerImage.inside(userArgs) {
-          sh "cd /application && npm run build -- --buildtype=${envName}"
-          sh "cd /application && echo \"${buildDetails('buildtype': envName)}\" > build/${envName}/BUILD.txt" 
+        dockerImage.inside(args) {
+          sh "npm run build -- --buildtype=${envName}"
+          sh "echo \"${buildDetails('buildtype': envName)}\" > build/${envName}/BUILD.txt" 
         }
       }
     }
@@ -91,8 +93,8 @@ node('vets-website-linting') {
       def envName = envNames.get(i)
 
       builds[envName] = {
-        dockerImage.inside(userArgs) {
-          sh "BUILDTYPE=${envName} && cd /application && npm run test:unit"
+        dockerImage.inside(args + " -e BUILDTYPE=${envName}") {
+          sh "npm run test:unit"
         }
       }
     }
@@ -107,8 +109,8 @@ node('vets-website-linting') {
       def envName = envNames.get(i)
 
       builds[envName] = {
-        dockerImage.inside(userArgs) {
-          sh "BUILDTYPE=${envName} && cd /application && npm run test:e2e"
+        dockerImage.inside(args + " -e BUILDTYPE=${envName}") {
+          sh "npm run test:e2e"
         }
       }
     }
@@ -117,8 +119,8 @@ node('vets-website-linting') {
   }
 
   stage('Accessibility') {
-    dockerImage.inside(userArgs) {
-      sh "BUILDTYPE=development && cd /application && npm run test:accessibility"
+    dockerImage.inside(args + " -e BUILDTYPE=development") {
+      sh "npm run test:accessibility"
     }
   }
 }
