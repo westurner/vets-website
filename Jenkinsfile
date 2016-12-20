@@ -52,7 +52,7 @@ def dockerCommandWithEnv = { command, env ->
 node('vets-website-linting') {
   checkout scm
 
-  sh "mkdir build"
+  sh "mkdir -p build"
 
   def dockerImage = docker.build("vets-website:${env.BUILD_TAG}")
   def args = "-u root:root -v ${pwd()}/build:/application/build"
