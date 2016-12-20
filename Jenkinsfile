@@ -57,8 +57,12 @@ node('vets-website-linting') {
     return
   }
 
-  docker.build dockerImage
+  stage('Prepare') {
+    docker.build dockerImage
+  }
 
-  dockerCommandWithEnv('npm run build -- --buildtype=development', envs['development'])
+  stage('Build') {
+    dockerCommandWithEnv('npm run build -- --buildtype=development', envs['development'])
+  }
 }
 
