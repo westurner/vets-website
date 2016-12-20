@@ -98,8 +98,10 @@ pipeline {
       }
 
       steps {
-        docker.image("vets-website:${env.BUILD_TAG}").inside {
-          sh "npm run lint"
+        script {
+          docker.image("vets-website:${env.BUILD_TAG}").inside {
+            sh "npm run lint"
+          }
         }
       }
     }
