@@ -39,8 +39,6 @@ def buildDetails = { vars ->
   """.stripIndent()
 }
 
-def dockerImage = "vets-website:${env.BUILD_TAG}"
-
 def dockerCommandWithEnv = { command, env ->
   def envc = ""
   env.each { var ->  envc += "'${var}' " }
@@ -53,15 +51,12 @@ def dockerCommandWithEnv = { command, env ->
 node('vets-website-linting') {
   checkout scm
 
-  stage('Prepare') {
-    docker.build dockerImage
-  }
+  def dockerImage = docker.build("vets-website:${env.BUILD_TAG}")
 
   stage('Build') {
-    docker.image(dockerImage) {
-      sh "echo 'hello'"
+    dockerImage.inside {
+      sh "npm run build -- --buildtype=development"
     }
-    //dockerCommandWithEnv('npm run build -- --buildtype=development', envs['development'])
   }
 }
 
