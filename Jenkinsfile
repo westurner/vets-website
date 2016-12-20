@@ -54,9 +54,18 @@ node('vets-website-linting') {
   def dockerImage = docker.build("vets-website:${env.BUILD_TAG}")
 
   stage('Build') {
-    dockerImage.inside("-u root:root") {
-      sh "cd /application && npm run build -- --buildtype=development"
+    def builds = [:]
+
+    for (int i=0; i<envNames.size(); i++) {
+      def envName = envNames.get(i)
+
+      builds[envName] = {
+        dockerImage.inside("-u root:root") {
+          sh "cd /application && npm run build -- --buildtype=${envName}"
+        }
+      }
     }
+
+    parallel builds
   }
 }
-
