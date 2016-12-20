@@ -40,8 +40,8 @@ def buildDetails = { vars ->
 
 def dockerCommandWithEnv = { command, env ->
   def envc = ""
-  env.each { var ->  envc += "-e '${var}'" }
-  "docker run --rm -t -v `pwd`/build:/application/build ${envc} vets-website:build-${env.BUILD_NUMBER} ${command}"
+  env.each { var ->  envc += "'${var}' " }
+  "${envc}${command}"
 }
 
 pipeline {
@@ -71,7 +71,7 @@ pipeline {
       }
 
       steps {
-        sh "docker build -t vets-website:build-${env.BUILD_NUMBER} ."
+        docker.build "vets-website:${env.BUILD_TAG}"
       }
     }
 
@@ -81,7 +81,9 @@ pipeline {
       }
 
       steps {
-        sh dockerCommandWithEnv("check", [:])
+        docker.image("vets-website:${env.BUILD_TAG}").inside {
+          sh "nsp check"
+        }
       }
     }
 
@@ -91,7 +93,9 @@ pipeline {
       }
 
       steps {
-        sh dockerCommandWithEnv("lint", [:])
+        docker.image("vets-website:${env.BUILD_TAG}").inside {
+          sh "npm run lint"
+        }
       }
     }
 
@@ -103,21 +107,24 @@ pipeline {
       steps {
         parallel(
           'development': {
-            sh "rm -rf build/development"
-            sh dockerCommandWithEnv("build", envs['development'])
-            sh "echo \"${buildDetails('buildtype': 'development')}\" > build/development/BUILD.txt" 
+            docker.image("vets-website:${env.BUILD_TAG}").inside {
+              sh dockerCommandWithEnv("npm run build -- --buildtype=development", envs['development'])
+              sh "echo \"${buildDetails('buildtype': 'development')}\" > build/development/BUILD.txt" 
+            }
           },
 
           'staging': {
-            sh "rm -rf build/staging"
-            sh dockerCommandWithEnv("build", envs['staging'])
-            sh "echo \"${buildDetails('buildtype': 'staging')}\" > build/staging/BUILD.txt" 
+            docker.image("vets-website:${env.BUILD_TAG}").inside {
+              sh dockerCommandWithEnv("npm run build -- --buildtype=staging", envs['staging'])
+              sh "echo \"${buildDetails('buildtype': 'staging')}\" > build/staging/BUILD.txt" 
+            }
           },
 
           'production': {
-            sh "rm -rf build/production"
-            sh dockerCommandWithEnv("build", envs['production'])
-            sh "echo \"${buildDetails('buildtype': 'production')}\" > build/production/BUILD.txt" 
+            docker.image("vets-website:${env.BUILD_TAG}").inside {
+              sh dockerCommandWithEnv("npm run build -- --buildtype=production", envs['production'])
+              sh "echo \"${buildDetails('buildtype': 'production')}\" > build/production/BUILD.txt" 
+            }
           }
         )
       }
@@ -131,20 +138,27 @@ pipeline {
       steps {
         parallel(
           'development': {
-            sh dockerCommandWithEnv("test:unit", envs['development'])
+            docker.image("vets-website:${env.BUILD_TAG}").inside {
+              sh dockerCommandWithEnv("npm run test:unit", envs['development'])
+            }
           },
 
           'staging': {
-            sh dockerCommandWithEnv("test:unit", envs['staging'])
+            docker.image("vets-website:${env.BUILD_TAG}").inside {
+              sh dockerCommandWithEnv("npm run test:unit", envs['staging'])
+            }
           },
 
           'production': {
-            sh dockerCommandWithEnv("test:unit", envs['production'])
+            docker.image("vets-website:${env.BUILD_TAG}").inside {
+              sh dockerCommandWithEnv("npm run test:unit", envs['production'])
+            }
           }
         ) 
       }
     }
 
+/*
     stage('E2E') {
       when {
         !isPushNotificationOnFeature() && !isContentTeamUpdate() && !isProtectedMergePreviouslyTested()
@@ -177,4 +191,5 @@ pipeline {
       }
     }
   }
+*/
 }
