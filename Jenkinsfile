@@ -53,10 +53,6 @@ def dockerCommandWithEnv = { command, env ->
 node('vets-website-linting') {
   checkout scm
 
-  if (isPushNotificationOnFeature()) {
-    return
-  }
-
   stage('Prepare') {
     docker.build dockerImage
   }
