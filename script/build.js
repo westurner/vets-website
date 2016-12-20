@@ -84,15 +84,6 @@ switch (options.buildtype) {
     throw new Error(`Unknown buildtype: '${options.buildtype}'`);
 }
 
-// Build the DLL
-
-const buildDLL = callback => {
-  const webpackDLLConfig = require('../config/webpack.config.dll')(options);
-  const webpackDLLCompiler = require('webpack')(webpackDLLConfig);
-
-  webpackDLLCompiler.run(callback);
-};
-
 const buildSite = () => {
   const webpackConfig = webpackConfigGenerator(options);
 
