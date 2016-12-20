@@ -309,17 +309,3 @@ const buildSite = () => {
 };
 
 buildSite();
-
-/*
-if (options['site-only'] || !options['dll-only']) {
-  buildSite();
-} else {
-  buildDLL((err, _stats) => {
-    if (err) throw err;
-
-    if (!options['dll-only']) {
-      buildSite();
-    }
-  });
-}
-*/
