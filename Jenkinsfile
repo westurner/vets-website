@@ -70,20 +70,26 @@ node('vets-website-linting') {
   }
 
   stage('Build') {
-    def builds = [:]
+    if (isContentTeamUpdate()) {
+      dockerImage.inside(args) {
+        sh "cd /application && npm run build -- --buildtype=development"
+      }
+    } else {
+      def builds = [:]
 
-    for (int i=0; i<envNames.size(); i++) {
-      def envName = envNames.get(i)
+      for (int i=0; i<envNames.size(); i++) {
+        def envName = envNames.get(i)
 
-      builds[envName] = {
-        dockerImage.inside(args) {
-          sh "cd /application && npm run build -- --buildtype=${envName}"
-          sh "cd /application && echo \"${buildDetails('buildtype': envName)}\" > build/${envName}/BUILD.txt" 
+        builds[envName] = {
+          dockerImage.inside(args) {
+            sh "cd /application && npm run build -- --buildtype=${envName}"
+            sh "cd /application && echo \"${buildDetails('buildtype': envName)}\" > build/${envName}/BUILD.txt" 
+          }
         }
       }
-    }
 
-    parallel builds
+      parallel builds
+    }
   }
 
   stage('Unit') {
