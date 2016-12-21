@@ -12,7 +12,7 @@ module.exports = {
   src_folders: ['./test'],
   output_folder: './logs/nightwatch',
   custom_commands_path: './test/util/nightwatch-commands',
-  live_output: true,
+  live_output: false,
   parallel_process_delay: 100,
   disable_colors: false,
   test_settings: {
@@ -25,7 +25,7 @@ module.exports = {
       silent: true,
       output: true,
       screenshots: {
-        enabled: true,
+        enabled: false,
         on_failure: true,
         path: 'logs/screenshots'
       },

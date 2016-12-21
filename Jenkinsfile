@@ -66,14 +66,14 @@ node('vets-website-linting') {
 
   stage('Lint') {
     dockerImage.inside(args) {
-      sh "cd /application && npm run lint"
+      sh "cd /application && npm --no-color run lint"
     }
   }
 
   stage('Build') {
     if (isContentTeamUpdate()) {
       dockerImage.inside(args) {
-        sh "cd /application && npm run build -- --buildtype=development"
+        sh "cd /application && npm --no-color run build -- --buildtype=development"
       }
     } else {
       def builds = [:]
@@ -83,7 +83,7 @@ node('vets-website-linting') {
 
         builds[envName] = {
           dockerImage.inside(args) {
-            sh "cd /application && npm run build -- --buildtype=${envName}"
+            sh "cd /application && npm --no-color run build -- --buildtype=${envName}"
             sh "cd /application && echo \"${buildDetails('buildtype': envName)}\" > build/${envName}/BUILD.txt" 
           }
         }
@@ -101,7 +101,7 @@ node('vets-website-linting') {
 
       builds[envName] = {
         dockerImage.inside(args + " -e BUILDTYPE=${envName}") {
-          sh "cd /application && npm run test:unit"
+          sh "cd /application && npm --no-color run test:unit"
         }
       }
     }
@@ -117,7 +117,7 @@ node('vets-website-linting') {
 
       builds[envName] = {
         dockerImage.inside(args + " -e BUILDTYPE=${envName}") {
-          sh "cd /application && npm run test:e2e"
+          sh "cd /application && npm --no-color run test:e2e"
         }
       }
     }
@@ -127,7 +127,7 @@ node('vets-website-linting') {
 
   stage('Accessibility') {
     dockerImage.inside(args + " -e BUILDTYPE=development") {
-      sh "cd /application && npm run test:accessibility"
+      sh "cd /application && npm --no-color run test:accessibility"
     }
   }
 }
