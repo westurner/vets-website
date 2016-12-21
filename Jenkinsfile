@@ -1,20 +1,6 @@
 def envNames = ['development', 'staging', 'production']
-def envs = [:]
 
-env.BRANCH_NAME = 'jk-build-improvements'
 env.NODE_ENV = 'production'
-
-// Define build environments for each build type.
-// Some useful branch-api-plugin env docs: https://github.com/jglick/branch-api-plugin/blob/fe9b02af870105954f978b52faab2669c787dc9f/src/main/resources/jenkins/branch/BranchNameContributor/buildEnv.properties
-
-for (int i=0; i < envNames.size(); i++) {
-  def envName = envNames.get(i)
-
-  envs[envName] = [
-    "NODE_ENV=production",
-    "BUILDTYPE=${envName}"
-  ]
-}
 
 def isPushNotificationOnFeature = {
   !env.CHANGE_TARGET && !['master', 'production'].contains(env.BRANCH_NAME)
@@ -40,23 +26,22 @@ def buildDetails = { vars ->
   """.stripIndent()
 }
 
-def dockerCommandWithEnv = { command, env ->
-  def envc = ""
-  env.each { var ->  envc += "'${var}' " }
-
-  docker.image(dockerImage).inside {
-    sh "${envc}${command}"
-  }
-}
-
 node('vets-website-linting') {
-  checkout scm
+  def dockerImage, args
 
-  sh "mkdir -p build"
-  sh "mkdir -p logs/selenium"
+  // Checkout source, create output directories, build container
 
-  def dockerImage = docker.build("vets-website:${env.BUILD_TAG}")
-  def args = "-u root:root -v ${pwd()}/build:/application/build -v ${pwd()}/logs:/application/logs"
+  stage('Setup') {
+    checkout scm
+
+    sh "mkdir -p build"
+    sh "mkdir -p logs/selenium"
+
+    dockerImage = docker.build("vets-website:${env.BUILD_TAG}")
+    args = "-u root:root -v ${pwd()}/build:/application/build -v ${pwd()}/logs:/application/logs"
+  }
+
+  // Check package.json for known vulnerabilities
 
   stage('Security') {
     dockerImage.inside(args) {
@@ -64,36 +49,48 @@ node('vets-website-linting') {
     }
   }
 
+  // Check source for syntax issues
+
   stage('Lint') {
     dockerImage.inside(args) {
       sh "cd /application && npm --no-color run lint"
     }
   }
 
+  // Perform a build for each required build type
+
   stage('Build') {
     if (isContentTeamUpdate()) {
       dockerImage.inside(args) {
         sh "cd /application && npm --no-color run build -- --buildtype=development"
       }
-    } else {
-      def builds = [:]
 
-      for (int i=0; i<envNames.size(); i++) {
-        def envName = envNames.get(i)
+      return
+    }
 
-        builds[envName] = {
-          dockerImage.inside(args) {
-            sh "cd /application && npm --no-color run build -- --buildtype=${envName}"
-            sh "cd /application && echo \"${buildDetails('buildtype': envName)}\" > build/${envName}/BUILD.txt" 
-          }
+    def builds = [:]
+
+    for (int i=0; i<envNames.size(); i++) {
+      def envName = envNames.get(i)
+
+      builds[envName] = {
+        dockerImage.inside(args) {
+          sh "cd /application && npm --no-color run build -- --buildtype=${envName}"
+          sh "cd /application && echo \"${buildDetails('buildtype': envName)}\" > build/${envName}/BUILD.txt" 
         }
       }
-
-      parallel builds
     }
+
+    parallel builds
   }
 
+  // Run unit tests for each build type
+
   stage('Unit') {
+    if (isContentTeamUpdate() || isPushNotificationOnFeature()) {
+      return
+    }
+
     def builds = [:]
 
     for (int i=0; i<envNames.size(); i++) {
@@ -109,7 +106,13 @@ node('vets-website-linting') {
     parallel builds
   }
 
+  // Run integration tests for each build type
+
   stage('E2E') {
+    if (isContentTeamUpdate() || isPushNotificationOnFeature()) {
+      return
+    }
+
     def builds = [:]
 
     for (int i=0; i<envNames.size(); i++) {
@@ -125,7 +128,13 @@ node('vets-website-linting') {
     parallel builds
   }
 
+  // Run accessibility tests for the development build type
+
   stage('Accessibility') {
+    if (isContentTeamUpdate() || isPushNotificationOnFeature()) {
+      return
+    }
+
     dockerImage.inside(args + " -e BUILDTYPE=development") {
       sh "cd /application && npm --no-color run test:accessibility"
     }
