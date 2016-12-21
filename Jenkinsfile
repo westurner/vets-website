@@ -53,9 +53,10 @@ node('vets-website-linting') {
   checkout scm
 
   sh "mkdir -p build"
+  sh "mkdir -p logs/selenium"
 
   def dockerImage = docker.build("vets-website:${env.BUILD_TAG}")
-  def args = "-u root:root -v ${pwd()}/build:/application/build"
+  def args = "-u root:root -v ${pwd()}/build:/application/build -v ${pwd()/logs:/application/logs"
 
   stage('Security') {
     dockerImage.inside(args) {
