@@ -11,11 +11,13 @@ import prescriptions from '../../common/reducers/rx-prescriptions';
 export default combineReducers({
   userLogin,
   userProfile,
-  rx: combineReducers({
-    alert,
-    disclaimer,
-    modals,
-    prescriptions
+  health: combineReducers({
+    rx: combineReducers({
+      alert,
+      disclaimer,
+      modals,
+      prescriptions
+    }),
   }),
 });
 
