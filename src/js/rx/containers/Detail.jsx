@@ -212,10 +212,11 @@ export class Detail extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+  const rxState = state.rx;
   return {
-    alert: state.rxAlert,
-    loading: state.rxPrescriptions.detail.loading,
-    prescription: state.rxPrescriptions.currentItem
+    alert: rxState.alert,
+    loading: rxState.prescriptions.detail.loading,
+    prescription: rxState.prescriptions.currentItem
   };
 };
 
