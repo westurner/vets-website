@@ -48,8 +48,9 @@ class AuthApplicationSection extends React.Component {
 
 // TODO: fill this out
 const mapStateToProps = (state) => {
+  const userState = state.user;
   return {
-    profile: state.userProfile
+    profile: userState.profile
   };
 };
 
