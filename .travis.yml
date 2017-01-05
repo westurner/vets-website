@@ -31,6 +31,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
+    - cgroup-tools
 
 before_deploy:
   - npm install -g s3-cli
