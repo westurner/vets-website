@@ -193,8 +193,8 @@ History.contextTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    ...state.prescriptions.history,
-    prescriptions: state.prescriptions.items
+    ...state.rxPrescriptions.history,
+    prescriptions: state.rxPrescriptions.items
   };
 };
 

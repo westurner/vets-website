@@ -213,9 +213,9 @@ export class Detail extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    alert: state.alert,
-    loading: state.prescriptions.detail.loading,
-    prescription: state.prescriptions.currentItem
+    alert: state.rxAlert,
+    loading: state.rxPrescriptions.detail.loading,
+    prescription: state.rxPrescriptions.currentItem
   };
 };
 

@@ -35,8 +35,8 @@ class UserDataSection extends React.Component {
 // TODO: fill this out
 const mapStateToProps = (state) => {
   return {
-    name: state.profile.userFullName,
-    profile: state.profile
+    name: state.userProfile.userFullName,
+    profile: state.userProfile
   };
 };
 
