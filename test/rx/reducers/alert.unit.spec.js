@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import alertReducer from '../../../src/js/rx/reducers/alert.js';
+import alertReducer from '../../../src/js/common/reducers/rx-alert.js';
 
 describe('alert reducer', () => {
   it('should open the alert', () => {

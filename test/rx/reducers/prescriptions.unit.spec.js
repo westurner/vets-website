@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import prescriptionsReducer from '../../../src/js/rx/reducers/prescriptions.js';
+import prescriptionsReducer from '../../../src/js/common/reducers/rx-prescriptions.js';
 
 describe('prescriptions reducer', () => {
   it('should show a loading screen for active', () => {

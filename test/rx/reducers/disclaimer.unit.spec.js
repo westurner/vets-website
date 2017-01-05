@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import disclaimerReducer from '../../../src/js/rx/reducers/disclaimer.js';
+import disclaimerReducer from '../../../src/js/common/reducers/rx-disclaimer.js';
 
 describe('disclaimer reducer', () => {
   it('should close the disclaimer', () => {

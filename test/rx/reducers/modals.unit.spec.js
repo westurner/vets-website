@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import modalsReducer from '../../../src/js/rx/reducers/modals.js';
+import modalsReducer from '../../../src/js/common/reducers/rx-modals.js';
 
 describe('modal reducer', () => {
   it('should open the refill modal', () => {
